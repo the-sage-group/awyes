@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require("fs");
+const nodegit = require("nodegit");
 const child_process = require("child_process");
 
 // Run the cloudview interface

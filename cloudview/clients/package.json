@@ -1,4 +1,12 @@
 {
+  "name": "sage",
+  "version": "1.0.0",
+  "description": "a sick dating app",
+  "scripts": {},
   "main": "awyes.ts",
-  "dependencies": {}
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-acm": "^3.675.0"
+  }
 }

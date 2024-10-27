@@ -1,0 +1,37 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Flow {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id         String   @id @default(uuid())
+  name       String
+  client     String
+  Action     Action[]
+  StartEdges Edge[]   @relation(name: "StartTask")
+  EndEdges   Edge[]   @relation(name: "EndTask")
+}
+
+model Edge {
+  id          String @id @default(uuid())
+  startTask   Task   @relation(name: "StartTask", fields: [startTaskId], references: [id])
+  startTaskId String
+  endTask     Task   @relation(name: "EndTask", fields: [endTaskId], references: [id])
+  endTaskId   String
+}
+
+model Action {
+  id        String   @id @default(uuid())
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    String
+  result    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
