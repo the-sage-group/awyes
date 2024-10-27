@@ -1,25 +1,27 @@
 #!/usr/bin/env node
 const fs = require("fs");
-const nodegit = require("nodegit");
 const child_process = require("child_process");
 
 // Run the cloudview interface
-fs.cpSync(
-  "./awyes.ts",
-  "./node_modules/@the-sage-group/awyes/cloudview/clients/awyes.ts"
-);
-fs.cpSync(
-  "./package.json",
-  "./node_modules/@the-sage-group/awyes/cloudview/clients/package.json"
-);
-child_process.execSync("npm install", {
-  cwd: "./node_modules/@the-sage-group/awyes/cloudview/clients",
+if (fs.existsSync("./.awyes")) {
+  fs.rmSync("./.awyes", { recursive: true });
+}
+child_process.spawnSync("git", [
+  "clone",
+  "https://github.com/the-sage-group/awyes.git",
+  ".awyes",
+]);
+child_process.spawnSync("npm", ["install"], { cwd: "./.awyes/cloudview" });
+fs.cpSync("./awyes.ts", "./.awyes/cloudview/clients/awyes.ts");
+fs.cpSync("./package.json", "./.awyes/cloudview/clients/package.json");
+child_process.spawnSync("npm", ["install"], {
+  cwd: "./.awyes/cloudview/clients",
 });
 const cloudview = child_process.spawn("npm", [
   "run",
   "dev",
   "--prefix",
-  "./node_modules/@the-sage-group/awyes/cloudview",
+  "./.awyes/cloudview",
 ]);
-cloudview.stdout.on("data", (data) => process.stdout.write(data.toString()));
-cloudview.stderr.on("data", (data) => process.stderr.write(data.toString()));
+cloudview.stdout.on("data", (data) => console.log(data.toString()));
+cloudview.stderr.on("data", (data) => console.log(data.toString()));

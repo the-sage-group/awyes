@@ -4,6 +4,7 @@ import Flow from "./Flow";
 import clients from "../clients";
 
 function App() {
+  console.log("big daddy: ", clients);
   return (
     <>
       <Flow />

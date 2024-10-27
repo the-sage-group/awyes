@@ -1,12 +1,9 @@
 {
-  "name": "sage",
+  "name": "cloudview-clients",
   "version": "1.0.0",
-  "description": "a sick dating app",
+  "description": "a place where clients can view their cloud infrastructure",
   "scripts": {},
   "main": "awyes.ts",
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@aws-sdk/client-acm": "^3.675.0"
-  }
+  "license": "ISC"
 }
