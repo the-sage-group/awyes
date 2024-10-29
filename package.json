@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/bb-labs/awyes/issues"
   },
-  "homepage": "https://github.com/bb-labs/awyes#readme"
+  "homepage": "https://github.com/bb-labs/awyes#readme",
+  "dependencies": {
+    "@the-sage-group/cloudview": "file:../cloudview"
+  }
 }

@@ -1,9 +1,0 @@
-{
-  "name": "cloudview-clients",
-  "version": "1.0.0",
-  "description": "a place where clients can view their cloud infrastructure",
-  "scripts": {},
-  "main": "awyes.ts",
-  "author": "",
-  "license": "ISC"
-}
