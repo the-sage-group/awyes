@@ -27,21 +27,17 @@ export class Flow<T extends object> {
   }
 }
 
-type Flows = (...args: any[]) => Flow<any>;
+type Workflow = (...args: any[]) => Flow<any>;
 
-export function serve(...flows: Flows[]) {
+export function serve(...workflows: Workflow[]) {
   const app = express();
   const port = 3000;
 
-  flows.forEach((flow) => {
-    typeOf<string>();
-    // app.get(`/${flow.name}`, (req, res) => {
-    //   const instance = flow();
-    //   res.send(instance);
-    // });
+  workflows.forEach((flow) => {
+    console.log(typeOf<typeof flow>());
   });
 
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-  });
+  // app.listen(port, () => {
+  //   console.log(`Example app listening on port ${port}`);
+  // });
 }

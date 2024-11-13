@@ -1,7 +1,10 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es6",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true
+  },
+  "reflection": true
 }
