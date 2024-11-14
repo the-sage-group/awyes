@@ -1,37 +1,32 @@
-import express from "express";
-import { App } from "@deepkit/app";
+import { Command } from "commander";
 import { validate } from "@deepkit/type";
+import JSON5 from "json5";
 
 import * as types from "./types";
-
 export * from "./types";
+
 export function register(...workflows: types.Workflow<any>[]) {
-  const capp = new App({});
-  const eapp = express();
-  eapp.use(express.json());
+  const program = new Command();
+
+  program.name("awyes").description("CLI tool for running workflows");
 
   workflows.forEach((flow) => {
-    console.log(
-      validate<Parameters<typeof flow>[number]>({
-        domainName: "string",
-        subDomains: ["string"],
-      })
-    );
-
-    capp.command(flow.name, () => {
-      console.log("Whoa");
-    });
-
-    eapp.get(`/${flow.name}`, (req, res) => {
-      res.send(flow({}));
-    });
-
-    eapp.post(`/${flow.name}`, (req, res) => {
-      console.log(req.body);
-      res.send(req.body);
-    });
+    program
+      .command(flow.name)
+      .description("Run the " + flow.name + " workflow")
+      .argument(
+        `<params>`,
+        `JSON string of the parameters for the ${flow.name} workflow`
+      )
+      .action((params: string) => {
+        params = JSON5.parse(params);
+        const errors = validate<Parameters<typeof flow>[number]>(params);
+        if (errors.length) {
+          return console.error(errors);
+        }
+        console.log(flow(params));
+      });
   });
 
-  capp.run();
-  // eapp.listen(3000, () => {});
+  program.parse();
 }

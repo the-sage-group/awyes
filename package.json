@@ -3,15 +3,13 @@
   "version": "0.1.1",
   "main": "awyes.ts",
   "bin": "./index.sh",
-  "scripts": {
-    "start": "ts-node awyes.ts"
-  },
   "dependencies": {
-    "@deepkit/app": "^1.0.1-alpha.155",
     "@deepkit/type": "^1.0.1-alpha.155",
     "@deepkit/type-compiler": "^1.0.1-alpha.155",
     "@types/express": "^5.0.0",
+    "commander": "^12.1.0",
     "express": "^4.21.1",
+    "json5": "^2.2.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   },
