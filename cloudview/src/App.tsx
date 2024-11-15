@@ -1,9 +1,10 @@
+import { ws, http } from "./client";
 import { AppShell } from "@mantine/core";
-
 import Flow from "./Flow";
 import "./App.css";
 
 export default function App() {
+  console.log(ws, http);
   return (
     <AppShell
       header={{ height: 60 }}

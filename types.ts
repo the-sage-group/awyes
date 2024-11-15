@@ -22,6 +22,12 @@ export class Flow<T extends object> {
       [P in K | keyof T]: P extends keyof T ? T[P] : V;
     }>([...this.nodes, node] as any);
   }
+
+  execute() {
+    for (const node of this.nodes) {
+      this.context[node.id] = node.action(this);
+    }
+  }
 }
 
 export type Workflow<T extends object> = (params: T) => Flow<any>;
