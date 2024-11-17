@@ -1,6 +1,5 @@
 import JSON5 from "json5";
 import express from "express";
-import { WebSocketServer } from "ws";
 import { Command } from "commander";
 import { validate } from "@deepkit/type";
 import * as types from "./types";
