@@ -2,16 +2,15 @@
   "name": "@the-sage-group/awyes",
   "version": "0.1.1",
   "main": "awyes.ts",
-  "bin": {
-    "awyes": "./index.sh",
-    "serve": "./serve.sh"
-  },
+  "bin": "./index.sh",
   "dependencies": {
     "@deepkit/type": "^1.0.1-alpha.155",
     "@deepkit/type-compiler": "^1.0.1-alpha.155",
+    "@godaddy/terminus": "^4.12.1",
     "@types/express": "^5.0.0",
     "@types/ws": "^8.5.13",
     "commander": "^12.1.0",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "json5": "^2.2.3",
     "ts-node": "^10.9.2",
@@ -32,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/the-sage-group/awyes/issues"
   },
-  "homepage": "https://github.com/the-sage-group/awyes#readme"
+  "homepage": "https://github.com/the-sage-group/awyes#readme",
+  "devDependencies": {
+    "@types/cors": "^2.8.17"
+  }
 }

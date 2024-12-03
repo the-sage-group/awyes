@@ -1,6 +1,3 @@
-import axios from "axios";
-
-const http = axios.create({ baseURL: "http://localhost:3000/" });
 const ws = new WebSocket("ws://localhost:3001");
 
 ws.onopen = () => {
@@ -11,5 +8,3 @@ ws.onopen = () => {
 ws.onmessage = (message) => {
   console.log(`message received`, message.data);
 };
-
-export { http, ws };
