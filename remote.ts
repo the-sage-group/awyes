@@ -49,12 +49,14 @@ export function registerCallers(program: Command) {
         params = JSON5.parse(params);
         const errors = validate<Parameters<typeof workflow>[number]>(params);
         if (errors.length) {
-          return console.error(errors);
+          console.log(errors);
+          process.exit();
         }
-        fetch(`http://localhost:3000/${workflow.name}`, {
+        const response = await fetch(`http://localhost:3000/${workflow.name}`, {
           method: "POST",
           body: params,
         });
+        // console.log(response);
       });
   };
 }

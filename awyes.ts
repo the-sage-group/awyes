@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { Workflow } from "./types";
-import { createServer, registerCallers, registerReceivers } from "./remote";
 import { registerHeadless } from "./headless";
+import { createServer, registerCallers, registerReceivers } from "./remote";
 
 export * from "./types";
 
@@ -20,6 +20,7 @@ export async function register(workflows: Workflow<any>[]) {
       .then((server) => {
         workflows.forEach(registerReceivers(server));
       })
+      .catch(() => {}) // Ignore errors, this more than likely means the server is already running
       .finally(() => {
         workflows.forEach(registerCallers(program));
       });
