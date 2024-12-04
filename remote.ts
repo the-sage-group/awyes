@@ -54,9 +54,12 @@ export function registerCallers(program: Command) {
         }
         const response = await fetch(`http://localhost:3000/${workflow.name}`, {
           method: "POST",
-          body: params,
+          body: JSON.stringify(params),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
-        // console.log(response);
+        console.log(await response.json());
       });
   };
 }
