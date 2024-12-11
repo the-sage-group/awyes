@@ -1,27 +1,25 @@
 import JSON5 from "json5";
 import { Express } from "express";
 import { Command } from "commander";
-import { validate } from "@deepkit/type";
-import { Flow } from "./types";
 
-export function createServer(): Promise<Express> {
+export function server(): Promise<Express> {
   return new Promise(async (resolve, reject) => {
     const { default: express } = await import("express");
     const { default: cors } = await import("cors");
 
-    const server = express();
-    server.use(cors());
-    server.use(express.json());
-    server.set("json replacer", (key, value) => {
+    const rest = express();
+    rest.use(cors());
+    rest.use(express.json());
+    rest.set("json replacer", (key, value) => {
       if (typeof value === "function") {
         return value.name;
       }
       return value;
     });
 
-    server
+    rest
       .listen(3000, () => {
-        resolve(server);
+        resolve(rest);
       })
       .on("error", (err) => {
         reject(err);
@@ -67,6 +65,29 @@ export function registerCallers(program: Command) {
           },
         });
         console.log(await response.json());
+      });
+  };
+}
+
+export function headless(program: Command) {
+  return function (flow: Flow<any>) {
+    program
+      .command(flow.name)
+      .description(`Run the ${flow.name} flow`)
+      .argument(
+        `[params]`,
+        `JSON string of the parameters for the ${flow.name} flow`,
+        "{}"
+      )
+      .action(async (params: string) => {
+        params = JSON5.parse(params);
+        const errors = validate<Parameters<typeof flow>[number]>(params);
+        if (errors.length) {
+          return console.error(errors);
+        }
+        await flow(params).execute((node, context) => {
+          console.dir({ [node.name]: context }, { depth: null });
+        });
       });
   };
 }
