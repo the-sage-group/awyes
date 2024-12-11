@@ -1,4 +1,5 @@
 import { AppShell } from "@mantine/core";
+import { NavLink, useParams } from "react-router";
 import { useEffect, useState } from "react";
 
 import Flow from "./Flow";
@@ -30,12 +31,9 @@ export default function App() {
 
       <AppShell.Navbar p="md">
         {workflows.map((workflow) => (
-          <button
-            key={workflow}
-            onClick={() => fetch(`http://localhost:3000/${workflow}`)}
-          >
+          <NavLink key={workflow} to={`${workflow}`}>
             {workflow}
-          </button>
+          </NavLink>
         ))}
       </AppShell.Navbar>
 

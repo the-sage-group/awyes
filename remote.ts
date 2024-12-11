@@ -2,7 +2,7 @@ import JSON5 from "json5";
 import { Express } from "express";
 import { Command } from "commander";
 import { validate } from "@deepkit/type";
-import { Workflow } from "./types";
+import { Flow } from "./types";
 
 export function createServer(): Promise<Express> {
   return new Promise(async (resolve, reject) => {
@@ -12,6 +12,12 @@ export function createServer(): Promise<Express> {
     const server = express();
     server.use(cors());
     server.use(express.json());
+    server.set("json replacer", (key, value) => {
+      if (typeof value === "function") {
+        return value.name;
+      }
+      return value;
+    });
 
     server
       .listen(3000, () => {
@@ -24,35 +30,36 @@ export function createServer(): Promise<Express> {
 }
 
 export function registerReceivers(server: Express) {
-  return function (workflow: Workflow<any>) {
-    server.get(`/${workflow.name}`, (req, res) => {
-      res.send(workflow({}));
+  return function (flow: Flow<any>) {
+    server.get(`/${flow.name}`, (req, res) => {
+      const graph = flow({});
+      res.send({ nodes: graph.nodes, edges: graph.edges });
     });
 
-    server.post(`/${workflow.name}`, (req, res) => {
+    server.post(`/${flow.name}`, (req, res) => {
       res.send(req.body);
     });
   };
 }
 
 export function registerCallers(program: Command) {
-  return function (workflow: Workflow<any>) {
+  return function (flow: Flow<any>) {
     program
-      .command(workflow.name)
-      .description(`Run the ${workflow.name} workflow`)
+      .command(flow.name)
+      .description(`Run the ${flow.name} flow`)
       .argument(
         `[params]`,
-        `JSON string of the parameters for the ${workflow.name} workflow`,
+        `JSON string of the parameters for the ${flow.name} flow`,
         "{}"
       )
       .action(async (params: string) => {
         params = JSON5.parse(params);
-        const errors = validate<Parameters<typeof workflow>[number]>(params);
+        const errors = validate<Parameters<typeof flow>[number]>(params);
         if (errors.length) {
           console.log(errors);
           process.exit();
         }
-        const response = await fetch(`http://localhost:3000/${workflow.name}`, {
+        const response = await fetch(`http://localhost:3000/${flow.name}`, {
           method: "POST",
           body: JSON.stringify(params),
           headers: {
