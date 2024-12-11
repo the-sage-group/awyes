@@ -14,7 +14,7 @@ import "@xyflow/react/dist/style.css";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
-import * as types from "../../types";
+import * as types from "../../catalog";
 
 const initialNodes: Node[] = [
   // { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },

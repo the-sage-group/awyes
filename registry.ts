@@ -27,7 +27,7 @@ export function server(): Promise<Express> {
   });
 }
 
-export function registerReceivers(server: Express) {
+export function receivers(server: Express) {
   return function (flow: Flow<any>) {
     server.get(`/${flow.name}`, (req, res) => {
       const graph = flow({});
@@ -40,7 +40,7 @@ export function registerReceivers(server: Express) {
   };
 }
 
-export function registerCallers(program: Command) {
+export function callers(program: Command) {
   return function (flow: Flow<any>) {
     program
       .command(flow.name)
