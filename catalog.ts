@@ -1,16 +1,6 @@
 import pkg from "./package.json";
 import * as ts from "typescript";
-
-type Catalog = {
-  [name: string]: {
-    id: string;
-    action: (...args: any[]) => any;
-    metadata: {
-      parameters: Record<string, string>;
-      returnType: string;
-    };
-  };
-};
+import { Catalog } from "./types";
 
 export default function compile(entryFile: string, recipes: object[]): Catalog {
   const catalog: Catalog = {};
@@ -61,18 +51,21 @@ export default function compile(entryFile: string, recipes: object[]): Catalog {
           const func = node as ts.FunctionDeclaration;
           const name = func.name.getText();
           const signature = checker.getSignatureFromDeclaration(func);
-          const parameters = Object.fromEntries(
-            func.parameters.map((p) => [p.name.getText(), p.type.getText()])
+          const parameters = func.parameters.map((p) => ({
+            name: p.name.getText(),
+            type: p.type.getText(),
+          }));
+          const deps = parameters.map((p) =>
+            [...p.type.matchAll(/typeof\s+(\w+)/g)].map((m) => m[1])
           );
           const returnType = checker.typeToString(
             checker.getReturnTypeOfSignature(signature),
             undefined,
             ts.TypeFormatFlags.NoTruncation
           );
-          catalog[name] = {
-            ...catalog[name],
-            metadata: { parameters, returnType },
-          };
+          catalog[name] = Object.assign({}, catalog[name], {
+            metadata: { parameters, returnType, deps: deps.flat() },
+          });
           break;
         }
         default:
@@ -82,8 +75,8 @@ export default function compile(entryFile: string, recipes: object[]): Catalog {
   })(sourceFile);
 
   // Remove any functions that don't have metadata, or don't have an action
-  Object.keys(catalog).forEach((name) => {
-    if (!catalog[name].metadata || !catalog[name].action) {
+  Object.entries(catalog).forEach(([name, node]) => {
+    if (!node.metadata || !node.action) {
       delete catalog[name];
     }
   });

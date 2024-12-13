@@ -1,6 +1,7 @@
 import JSON5 from "json5";
 import { Express } from "express";
 import { Command } from "commander";
+import { Catalog, Node } from "./types";
 
 export function server(): Promise<Express> {
   return new Promise(async (resolve, reject) => {
@@ -27,37 +28,55 @@ export function server(): Promise<Express> {
   });
 }
 
-export function receivers(server: Express) {
-  return function (flow: Flow<any>) {
-    server.get(`/${flow.name}`, (req, res) => {
-      const graph = flow({});
-      res.send({ nodes: graph.nodes, edges: graph.edges });
+export function receivers(server: Express, catalog: Catalog) {
+  server.get("/", (req, res) => {
+    res.send(catalog);
+  });
+  return function (action: Node) {
+    server.get(`/${action.id}`, (req, res) => {
+      const graph = { nodes: [], edges: [] };
+      function resolveDeps(node: Node) {
+        if (graph.nodes.find((n) => n.id === node.id)) return;
+
+        graph.nodes.push(node);
+
+        const deps = node.metadata.deps;
+        for (const dep of deps) {
+          const depNode = catalog[dep];
+          if (!depNode) continue;
+
+          graph.edges.push({
+            source: depNode.id,
+            target: node.id,
+          });
+
+          resolveDeps(depNode);
+        }
+      }
+
+      resolveDeps(action);
+      res.send(graph);
     });
 
-    server.post(`/${flow.name}`, (req, res) => {
+    server.post(`/${action.id}`, (req, res) => {
       res.send(req.body);
     });
   };
 }
 
-export function callers(program: Command) {
-  return function (flow: Flow<any>) {
+export function callers(program: Command, catalog: Catalog) {
+  return function (action: Node) {
     program
-      .command(flow.name)
-      .description(`Run the ${flow.name} flow`)
+      .command(action.id)
+      .description(`Run the ${action.id} action`)
       .argument(
         `[params]`,
-        `JSON string of the parameters for the ${flow.name} flow`,
+        `JSON string of the parameters for the ${action.id} action`,
         "{}"
       )
       .action(async (params: string) => {
         params = JSON5.parse(params);
-        const errors = validate<Parameters<typeof flow>[number]>(params);
-        if (errors.length) {
-          console.log(errors);
-          process.exit();
-        }
-        const response = await fetch(`http://localhost:3000/${flow.name}`, {
+        const response = await fetch(`http://localhost:3000/${action.id}`, {
           method: "POST",
           body: JSON.stringify(params),
           headers: {
@@ -69,25 +88,20 @@ export function callers(program: Command) {
   };
 }
 
-export function headless(program: Command) {
-  return function (flow: Flow<any>) {
+export function headless(program: Command, catalog: Catalog) {
+  return function (action: Node) {
     program
-      .command(flow.name)
-      .description(`Run the ${flow.name} flow`)
+      .command(action.id)
+      .description(`Run the ${action.id} action`)
       .argument(
         `[params]`,
-        `JSON string of the parameters for the ${flow.name} flow`,
+        `JSON string of the parameters for the ${action.id} action`,
         "{}"
       )
       .action(async (params: string) => {
         params = JSON5.parse(params);
-        const errors = validate<Parameters<typeof flow>[number]>(params);
-        if (errors.length) {
-          return console.error(errors);
-        }
-        await flow(params).execute((node, context) => {
-          console.dir({ [node.name]: context }, { depth: null });
-        });
+        const result = await action.action(params);
+        console.dir(result, { depth: null });
       });
   };
 }
