@@ -2,7 +2,7 @@ import compile from "./catalog";
 import * as registry from "./registry";
 import { Command } from "commander";
 
-export async function chef(...recipes: object[]) {
+export async function chef(recipes: object) {
   const catalog = compile("./awyes.ts", recipes);
   const program = new Command()
     .name("awyes")

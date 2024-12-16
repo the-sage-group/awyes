@@ -40,7 +40,7 @@ export function receivers(server: Express, catalog: Catalog) {
 
         graph.nodes.push(node);
 
-        const deps = node.metadata.deps;
+        const deps = node.deps;
         for (const dep of deps) {
           const depNode = catalog[dep];
           if (!depNode) continue;
