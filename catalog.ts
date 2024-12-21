@@ -1,87 +1,91 @@
 import pkg from "./package.json";
-import * as path from "path";
 import * as ts from "typescript";
-import { Catalog } from "./types";
+import * as path from "path";
+import { Node } from "./types";
 
-export default function compile(entryFile: string, actions: object): Catalog {
-  const catalog: Catalog = {};
+export default class Catalog {
+  entries: { [id: string]: Node };
+  module: object;
+  program: ts.Program;
+  checker: ts.TypeChecker;
+  sourceFile: ts.SourceFile;
 
-  const program = ts.createProgram([entryFile], {
-    target: ts.ScriptTarget.Latest,
-    module: ts.ModuleKind.CommonJS,
-    noResolve: false,
-    skipLibCheck: true,
-  });
-  const checker = program.getTypeChecker();
-  const sourceFile = program.getSourceFile(entryFile);
+  constructor(path: string, module: object) {
+    this.module = module;
+    this.entries = {};
+    this.program = ts.createProgram([path], {
+      target: ts.ScriptTarget.Latest,
+      module: ts.ModuleKind.CommonJS,
+      noResolve: false,
+      skipLibCheck: true,
+    });
+    this.checker = this.program.getTypeChecker();
+    this.sourceFile = this.program.getSourceFile(path);
+  }
 
-  (function follow(src: ts.SourceFile, dir: string = "") {
-    ts.forEachChild(src, (node) => {
+  findInModule(fileName: string, funcName: string) {
+    const module = fileName.split(path.sep).reduce((module, path) => {
+      return module[path] || module;
+    }, this.module);
+    return typeof module[funcName] === "function" ? module[funcName] : null;
+  }
+
+  scan(sourceFile: ts.SourceFile = this.sourceFile) {
+    ts.forEachChild(sourceFile, (node) => {
       switch (node.kind) {
         case ts.SyntaxKind.ExportDeclaration:
         case ts.SyntaxKind.ImportDeclaration: {
           const decl = node as ts.ImportDeclaration | ts.ExportDeclaration;
-          const module = decl.moduleSpecifier;
-          const symbol = checker.getSymbolAtLocation(module);
-          if (!module || !symbol) {
+          const spec = decl.moduleSpecifier;
+          const self = spec?.getText().includes(pkg.name);
+          const symbol = this.checker.getSymbolAtLocation(spec);
+          if (self || !spec || !symbol || !symbol.declarations.length) {
             return;
           }
-          const moduleName = module.getText().slice(1, -1);
-          if (moduleName.includes(pkg.name)) {
-            return;
-          }
-          follow(
-            symbol.declarations.pop() as ts.SourceFile,
-            path.join(dir, moduleName)
-          );
+          this.scan(symbol.declarations.pop() as ts.SourceFile);
           break;
         }
         case ts.SyntaxKind.FunctionDeclaration: {
           const func = node as ts.FunctionDeclaration;
           const name = func.name.getText();
-          const id = path.join(dir, name);
-          const action = id.split(path.sep).reduce((module, path) => {
-            return module[path] || module;
-          }, actions);
+          const action = this.findInModule(sourceFile.fileName, name);
           if (typeof action !== "function") {
             return;
           }
-          const signature = checker.getSignatureFromDeclaration(func);
+          const signature = this.checker.getSignatureFromDeclaration(func);
           const deps = func.parameters.map((p) => {
             const typeNode = p.type as ts.TypeReferenceNode;
             const depNode = typeNode.typeArguments?.[0] as ts.TypeQueryNode;
             if (!depNode) {
               return;
             }
-            const depType = checker.getTypeFromTypeNode(depNode);
-            const dep = depType.symbol.declarations.pop();
-            const depId = path.relative(dir, dep.getSourceFile().fileName);
-            console.log(depId);
-            return [];
+            const depSymbol = this.checker.getTypeFromTypeNode(depNode).symbol;
+            const depFunc = depSymbol.declarations[0] as ts.FunctionDeclaration;
+            const depAction = this.findInModule(
+              depFunc.getSourceFile().fileName,
+              depFunc.name.getText()
+            );
+            return depAction;
           });
           const parameters = func.parameters.map((p) => ({
             name: p.name.getText(),
             type: p.type.getText(),
           }));
-          const returnType = checker.typeToString(
-            checker.getReturnTypeOfSignature(signature),
+          const returnType = this.checker.typeToString(
+            this.checker.getReturnTypeOfSignature(signature),
             undefined,
             ts.TypeFormatFlags.NoTruncation
           );
-          catalog[id] = {
-            id,
-            action,
+          this.entries[name] = {
+            id: name,
+            action: console.log,
             parameters,
             returnType,
-            deps: deps.flat(),
+            deps: [],
           };
-          break;
         }
-        default:
-          break;
       }
     });
-  })(sourceFile);
-
-  return catalog;
+    return this;
+  }
 }

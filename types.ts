@@ -1,4 +1,3 @@
-export type Catalog = { [id: string]: Node };
 export type Node = {
   id: string;
   action: (...args: any[]) => any;

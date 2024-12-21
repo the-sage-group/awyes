@@ -1,7 +1,8 @@
 import JSON5 from "json5";
 import { Express } from "express";
 import { Command } from "commander";
-import { Catalog, Node } from "./types";
+import { Node } from "./types";
+import Catalog from "./catalog";
 
 export function server(): Promise<Express> {
   return new Promise(async (resolve, reject) => {
@@ -35,26 +36,6 @@ export function receivers(server: Express, catalog: Catalog) {
   return function (action: Node) {
     server.get(`/${action.id}`, (req, res) => {
       const graph = { nodes: [], edges: [] };
-      function resolveDeps(node: Node) {
-        if (graph.nodes.find((n) => n.id === node.id)) return;
-
-        graph.nodes.push(node);
-
-        const deps = node.deps;
-        for (const dep of deps) {
-          const depNode = catalog[dep];
-          if (!depNode) continue;
-
-          graph.edges.push({
-            source: depNode.id,
-            target: node.id,
-          });
-
-          resolveDeps(depNode);
-        }
-      }
-
-      resolveDeps(action);
       res.send(graph);
     });
 
