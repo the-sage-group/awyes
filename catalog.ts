@@ -1,37 +1,39 @@
 import pkg from "./package.json";
 import * as ts from "typescript";
-import * as path from "path";
+import { relative, parse, sep } from "path";
 import { Node } from "./types";
 
 export default class Catalog {
-  entries: { [id: string]: Node };
+  cwd: string;
+  src: ts.SourceFile;
+  nodes: Node[];
   module: object;
   program: ts.Program;
   checker: ts.TypeChecker;
-  sourceFile: ts.SourceFile;
 
   constructor(path: string, module: object) {
+    this.nodes = [];
     this.module = module;
-    this.entries = {};
     this.program = ts.createProgram([path], {
       target: ts.ScriptTarget.Latest,
       module: ts.ModuleKind.CommonJS,
-      noResolve: false,
-      skipLibCheck: true,
     });
     this.checker = this.program.getTypeChecker();
-    this.sourceFile = this.program.getSourceFile(path);
+    this.src = this.program.getSourceFile(path);
+    this.cwd = parse(process.cwd()).dir;
+
+    this.scan(this.src);
   }
 
   findInModule(fileName: string, funcName: string) {
-    const module = fileName.split(path.sep).reduce((module, path) => {
+    const module = fileName.split(sep).reduce((module, path) => {
       return module[path] || module;
     }, this.module);
     return typeof module[funcName] === "function" ? module[funcName] : null;
   }
 
-  scan(sourceFile: ts.SourceFile = this.sourceFile) {
-    ts.forEachChild(sourceFile, (node) => {
+  scan(src: ts.SourceFile) {
+    ts.forEachChild(src, (node) => {
       switch (node.kind) {
         case ts.SyntaxKind.ExportDeclaration:
         case ts.SyntaxKind.ImportDeclaration: {
@@ -48,25 +50,12 @@ export default class Catalog {
         case ts.SyntaxKind.FunctionDeclaration: {
           const func = node as ts.FunctionDeclaration;
           const name = func.name.getText();
-          const action = this.findInModule(sourceFile.fileName, name);
+          const id = `${parse(relative(this.cwd, src.fileName)).dir}/${name}`;
+          const action = this.findInModule(src.fileName, name);
           if (typeof action !== "function") {
             return;
           }
           const signature = this.checker.getSignatureFromDeclaration(func);
-          const deps = func.parameters.map((p) => {
-            const typeNode = p.type as ts.TypeReferenceNode;
-            const depNode = typeNode.typeArguments?.[0] as ts.TypeQueryNode;
-            if (!depNode) {
-              return;
-            }
-            const depSymbol = this.checker.getTypeFromTypeNode(depNode).symbol;
-            const depFunc = depSymbol.declarations[0] as ts.FunctionDeclaration;
-            const depAction = this.findInModule(
-              depFunc.getSourceFile().fileName,
-              depFunc.name.getText()
-            );
-            return depAction;
-          });
           const parameters = func.parameters.map((p) => ({
             name: p.name.getText(),
             type: p.type.getText(),
@@ -76,13 +65,17 @@ export default class Catalog {
             undefined,
             ts.TypeFormatFlags.NoTruncation
           );
-          this.entries[name] = {
-            id: name,
-            action: console.log,
+          const description = ts
+            .getJSDocCommentsAndTags(func)
+            .reduce((acc, tag) => acc + tag.comment, "");
+          this.nodes.push({
+            id,
+            name,
+            action,
             parameters,
             returnType,
-            deps: [],
-          };
+            description,
+          });
         }
       }
     });

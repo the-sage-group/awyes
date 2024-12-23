@@ -1,9 +1,10 @@
 export type Node = {
   id: string;
+  name: string;
+  description: string;
   action: (...args: any[]) => any;
   parameters: { name: string; type: string }[];
   returnType: string;
-  deps: string[];
 };
-export type Edge = { source: string; target: string };
-export type Graph = { nodes: Node[]; edges: Edge[] };
+export type Edge = { id: string; source: string; target: string };
+export type Graph = { name: string; nodes: Node[]; edges: Edge[] };
