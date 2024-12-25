@@ -1,36 +1,33 @@
-import * as awyes from "../../types";
-
+import { Node as AwYesNode } from "../../types";
 import { AppShell, Button } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 import Flow from "./Flow";
-import "./App.css";
-
-import { Node, Graph } from "../../types";
+import { FlowGraphType } from "./types";
 import { Search } from "./Search";
 import { SpotlightActionData, spotlight } from "@mantine/spotlight";
 import { IconFunction, IconPlus } from "@tabler/icons-react";
+import { toFlowNode } from "./Node";
 
 export default function App() {
   const [actions, setActions] = useState<SpotlightActionData[]>([]);
-  const [flow, setFlow] = useState<Graph>({
-    name: "untitled",
+  const [flow, setFlow] = useState<FlowGraphType>({
     nodes: [],
     edges: [],
   });
 
   useEffect(() => {
     fetch("http://localhost:3000/").then((res) => {
-      res.json().then((nodes: awyes.Node[]) => {
+      res.json().then((nodes: AwYesNode[]) => {
         setActions(
           nodes.map((node) => ({
             id: node.id,
-            label: node.id,
+            label: node.type,
             description: node.description,
             onClick: () => {
               setFlow((flow) => ({
                 ...flow,
-                nodes: [...flow.nodes, node],
+                nodes: [...flow.nodes, toFlowNode(node)],
               }));
             },
             leftSection: <IconFunction />,

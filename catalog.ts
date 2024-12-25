@@ -1,5 +1,6 @@
+import ts from "typescript";
 import pkg from "./package.json";
-import * as ts from "typescript";
+import { v4 as uuid } from "uuid";
 import { relative, parse, sep } from "path";
 import { Node } from "./types";
 
@@ -50,30 +51,39 @@ export default class Catalog {
         case ts.SyntaxKind.FunctionDeclaration: {
           const func = node as ts.FunctionDeclaration;
           const name = func.name.getText();
-          const id = `${parse(relative(this.cwd, src.fileName)).dir}/${name}`;
+          const type = `${parse(relative(this.cwd, src.fileName)).dir}/${name}`;
           const action = this.findInModule(src.fileName, name);
           if (typeof action !== "function") {
             return;
           }
+          const description = ts
+            .getJSDocCommentsAndTags(func)
+            .reduce((acc, tag) => acc + tag.comment, "");
           const signature = this.checker.getSignatureFromDeclaration(func);
           const parameters = func.parameters.map((p) => ({
             name: p.name.getText(),
             type: p.type.getText(),
+            value: null,
           }));
-          const returnType = this.checker.typeToString(
-            this.checker.getReturnTypeOfSignature(signature),
-            undefined,
-            ts.TypeFormatFlags.NoTruncation
-          );
-          const description = ts
-            .getJSDocCommentsAndTags(func)
-            .reduce((acc, tag) => acc + tag.comment, "");
+          const returnType = this.checker.getReturnTypeOfSignature(signature);
+          const awaitedType = this.checker.getAwaitedType(returnType);
+          const returnProps = this.checker.getPropertiesOfType(awaitedType);
+          const returnValues = returnProps.map((property) => ({
+            name: property.getName(),
+            type: this.checker.typeToString(
+              this.checker.getTypeOfSymbol(property),
+              undefined,
+              ts.TypeFormatFlags.NoTruncation
+            ),
+            value: null,
+          }));
           this.nodes.push({
-            id,
+            id: uuid(),
             name,
+            type,
             action,
             parameters,
-            returnType,
+            returnValues,
             description,
           });
         }

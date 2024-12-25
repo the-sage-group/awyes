@@ -1,48 +1,57 @@
-import * as awyes from "../../types";
-import * as xyflow from "@xyflow/react";
-import * as cloudview from "./Node";
-
-import "@xyflow/react/dist/style.css";
 import { useEffect } from "react";
+import {
+  ReactFlow,
+  useNodesState,
+  useEdgesState,
+  Controls,
+  Background,
+  BackgroundVariant,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import { FlowNode } from "./Node";
+import { addFlowEdge, FlowEdge } from "./Edge";
+import { FlowContext } from "./Context";
+import { FlowGraphType, FlowNodeType, FlowEdgeType } from "./types";
 
 const nodeTypes = {
-  flowNode: cloudview.Node,
+  flowNode: FlowNode,
 };
 
-export default function Flow({ flow }: { flow: awyes.Graph }) {
-  const [nodes, setNodes, onNodesChange] =
-    xyflow.useNodesState<cloudview.FlowNode>([]);
-  const [edges, setEdges, onEdgesChange] = xyflow.useEdgesState<xyflow.Edge>(
-    []
-  );
+const edgeTypes = {
+  flowEdge: FlowEdge,
+};
+
+export default function Flow({ flow }: { flow: FlowGraphType }) {
+  const [nodes, setNodes, onNodesChange] = useNodesState<FlowNodeType>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<FlowEdgeType>([]);
 
   useEffect(() => {
     setNodes([
       ...nodes,
-      ...flow.nodes
-        .filter((node) => !nodes.some((n) => n.id === node.id))
-        .map(cloudview.toFlowNode),
+      ...flow.nodes.filter((n) => !nodes.some((node) => node.id === n.id)),
     ]);
-    setEdges(flow.edges);
+    setEdges([
+      ...edges,
+      ...flow.edges.filter((e) => !edges.some((edge) => edge.id === e.id)),
+    ]);
   }, [flow]);
 
   return (
-    <xyflow.ReactFlow
-      fitView
-      nodes={nodes}
-      edges={edges}
-      minZoom={0.1}
-      nodeTypes={nodeTypes}
-      onConnect={console.log}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-    >
-      <xyflow.Controls />
-      <xyflow.Background
-        variant={xyflow.BackgroundVariant.Dots}
-        gap={12}
-        size={1}
-      />
-    </xyflow.ReactFlow>
+    <FlowContext.Provider value={{ nodes, edges, setNodes, setEdges }}>
+      <ReactFlow
+        fitView
+        nodes={nodes}
+        edges={edges}
+        minZoom={0.1}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onConnect={(connection) => addFlowEdge(connection, edges, setEdges)}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+      >
+        <Controls />
+        <Background variant={BackgroundVariant.Lines} gap={12} size={1} />
+      </ReactFlow>
+    </FlowContext.Provider>
   );
 }
