@@ -135,7 +135,7 @@ export function FlowEdge(props: EdgeProps<FlowEdgeType>) {
                     Source Output
                   </Text>
                 }
-                data={sourceNode?.data.returnValues.map((output) => ({
+                data={sourceNode?.data.returns.map((output) => ({
                   value: output.name,
                   label: output.name,
                 }))}

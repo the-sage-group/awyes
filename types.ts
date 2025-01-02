@@ -5,7 +5,7 @@ export type Node = {
   description: string;
   action: (...args: any[]) => any;
   parameters: { name: string; type: string; value: any }[];
-  returnValues: { name: string; type: string; value: any }[];
+  returns: { name: string; type: string; value: any }[];
 };
 export type Edge = {
   id: string;

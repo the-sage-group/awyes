@@ -102,14 +102,14 @@ export function FlowNode(props: NodeProps<FlowNodeType>) {
           </div>
         )}
 
-        {/* Return type */}
-        {node.returnValues.length > 0 && (
+        {/* Returns section */}
+        {node.returns.length > 0 && (
           <div>
             <Text size="sm" fw={600} c="dimmed" mb={4}>
               Returns
             </Text>
             <Stack gap={6}>
-              {node.returnValues.map((ret, index) => (
+              {node.returns.map((ret, index) => (
                 <Group key={index} gap={8}>
                   <Text size="sm" fw={500}>
                     {ret.name}

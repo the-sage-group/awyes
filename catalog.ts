@@ -53,22 +53,30 @@ export default class Catalog {
           const name = func.name.getText();
           const type = `${parse(relative(this.cwd, src.fileName)).dir}/${name}`;
           const action = this.findInModule(src.fileName, name);
-          if (typeof action !== "function") {
+          if (typeof action !== "function" || func.parameters.length > 1) {
             return;
           }
           const description = ts
             .getJSDocCommentsAndTags(func)
             .reduce((acc, tag) => acc + tag.comment, "");
           const signature = this.checker.getSignatureFromDeclaration(func);
-          const parameters = func.parameters.map((p) => ({
-            name: p.name.getText(),
-            type: p.type.getText(),
+          // Parameters
+          const paramType = this.checker.getTypeAtLocation(func.parameters[0]);
+          const paramProps = this.checker.getPropertiesOfType(paramType);
+          const parameters = paramProps.map((property) => ({
+            name: property.getName(),
+            type: this.checker.typeToString(
+              this.checker.getTypeOfSymbol(property),
+              undefined,
+              ts.TypeFormatFlags.NoTruncation
+            ),
             value: null,
           }));
+          // Returns
           const returnType = this.checker.getReturnTypeOfSignature(signature);
           const awaitedType = this.checker.getAwaitedType(returnType);
           const returnProps = this.checker.getPropertiesOfType(awaitedType);
-          const returnValues = returnProps.map((property) => ({
+          const returns = returnProps.map((property) => ({
             name: property.getName(),
             type: this.checker.typeToString(
               this.checker.getTypeOfSymbol(property),
@@ -83,7 +91,7 @@ export default class Catalog {
             type,
             action,
             parameters,
-            returnValues,
+            returns,
             description,
           });
         }
