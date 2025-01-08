@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package awyes.client;
+
+import "proto/awyes.proto";
+
+// Request to execute a node
+message ExecuteNodeRequest {
+  // The node to execute
+  awyes.Node node = 1;
+}
+
+// Response from node execution
+message ExecuteNodeResponse {
+  // Results from the execution
+  awyes.Node node = 1;
+
+  // Any errors that occurred during execution
+  optional string error = 2;
+}
+
+// AWyes Client Service - Handles actual execution of nodes
+service AwyesClientService {
+  // Execute a node with given parameters
+  rpc ExecuteNode(ExecuteNodeRequest) returns (ExecuteNodeResponse) {}
+}

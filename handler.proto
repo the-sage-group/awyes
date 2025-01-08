@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package awyes.handler;
+
+import "awyes.proto";
+
+// Handler registration request
+message RegisterHandlerRequest {
+  // The type identifier for this handler (e.g., "cookbook/aws/infra/getInfra")
+  string type = 1;
+
+  // Description of what this handler does
+  string description = 2;
+
+  // Input parameters this handler accepts
+  repeated Parameter parameters = 3;
+
+  // Return values this handler produces
+  repeated Return returns = 4;
+}
+
+// Handler registration response
+message RegisterHandlerResponse {
+  // Unique ID assigned to this handler
+  string handler_id = 1;
+
+  // The type that was registered
+  string type = 2;
+}
+
+// Handler deregistration request
+message DeregisterHandlerRequest {
+  // The handler ID to deregister
+  string handler_id = 1;
+}
+
+// Handler deregistration response
+message DeregisterHandlerResponse {
+  // Whether the deregistration was successful
+  bool success = 1;
+}
+
+// Request to list all registered handlers
+message ListHandlersRequest {}
+
+// Response containing all registered handlers
+message ListHandlersResponse {
+  message Handler {
+    string handler_id = 1;
+    string type = 2;
+    string description = 3;
+    repeated Parameter parameters = 4;
+    repeated Return returns = 5;
+  }
+
+  repeated Handler handlers = 1;
+}
+
+// Request to execute a specific handler
+message ExecuteHandlerRequest {
+  // The handler ID to execute
+  string handler_id = 1;
+
+  // Parameters for the execution
+  map<string, string> parameters = 2;
+}
+
+// Response from handler execution
+message ExecuteHandlerResponse {
+  // Results from the execution
+  map<string, string> results = 1;
+
+  // Any errors that occurred during execution
+  optional string error = 2;
+}
+
+// Handler registration service
+service HandlerService {
+  // Register a new handler
+  rpc RegisterHandler(RegisterHandlerRequest)
+      returns (RegisterHandlerResponse) {}
+
+  // Deregister an existing handler
+  rpc DeregisterHandler(DeregisterHandlerRequest)
+      returns (DeregisterHandlerResponse) {}
+
+  // List all registered handlers
+  rpc ListHandlers(ListHandlersRequest) returns (ListHandlersResponse) {}
+
+  // Execute a specific handler
+  rpc ExecuteHandler(ExecuteHandlerRequest) returns (ExecuteHandlerResponse) {}
+
+  // Stream for receiving execution requests from the main service
+  rpc HandleExecutions(stream ExecuteHandlerRequest)
+      returns (stream ExecuteHandlerResponse) {}
+}

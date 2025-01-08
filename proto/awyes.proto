@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package awyes;
+
+// Node parameter definition
+message Parameter {
+  string name = 1;
+  string type = 2;
+  optional string value = 3;
+}
+
+// Node return definition
+message Return {
+  string name = 1;
+  string type = 2;
+  optional string value = 3;
+}
+
+// Node definition
+message Node {
+  string id = 1;
+  string context = 2;
+  string name = 3;
+  string description = 4;
+  repeated Parameter parameters = 5;
+  repeated Return returns = 6;
+}
+
+// Flow definition
+message Flow {
+  string id = 1;
+  string name = 2;
+  string context = 3;
+  int32 version = 4;
+  string description = 5;
+  repeated Node nodes = 6;
+  repeated Edge edges = 7;
+  repeated Parameter parameters = 8;
+}
+
+// Edge definition
+message Edge {
+  string id = 1;
+  string source = 2;
+  string target = 3;
+}
+
+// Request to register a new flow
+message RegisterFlowRequest { Flow flow = 1; }
+
+// Response after registering a flow
+message RegisterFlowResponse { Flow flow = 1; }
+
+// Request to register a new node
+message RegisterNodeRequest { Node node = 1; }
+
+// Response after registering a node
+message RegisterNodeResponse { Node node = 1; }
+
+// Request to execute a flow
+message ExecuteFlowRequest { Flow flow = 1; }
+
+// Response from flow execution
+message ExecuteFlowResponse { Node node = 1; }
+
+// AWyes Service definition
+service AwyesService {
+  // Register a new flow
+  rpc RegisterFlow(RegisterFlowRequest) returns (RegisterFlowResponse) {}
+
+  // Register a new node
+  rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse) {}
+
+  // Execute a flow with parameters and stream results
+  rpc ExecuteFlow(ExecuteFlowRequest) returns (stream ExecuteFlowResponse) {}
+}
