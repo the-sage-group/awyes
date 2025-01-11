@@ -5,9 +5,10 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/the-sage-group/awyes/proto"
-	"github.com/the-sage-group/awyes/service"
 	"google.golang.org/grpc"
+
+	"github.com/the-sage-group/awyes/proto"
+	"github.com/the-sage-group/awyes/service"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterAwyesServiceServer(s, service.New())
+	proto.RegisterAwyesServiceServer(s, service.New())
 
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
