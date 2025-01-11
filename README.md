@@ -1,163 +1,63 @@
 # AWyes gRPC Service
 
-A gRPC service definition and utility library for AWS infrastructure automation.
+A gRPC service definition and utility library for infrastructure automation.
 
 ## Overview
 
-AWyes provides two complementary gRPC services for infrastructure automation:
+AWyes is a gRPC service for infrastructure automation that enables:
 
-1. **AWyes Service** (`awyes.proto`): The main service for managing and orchestrating infrastructure flows
-2. **AWyes Client Service** (`awyes_client.proto`): A service for executing individual infrastructure nodes
+- Registration and execution of infrastructure flows
+- Node-based infrastructure operations
+- Real-time execution monitoring through event streaming
+- Versioned and contextual flow management
 
-### AWyes Service
-The main service handles flow management:
-- Create, read, update, and delete flows
-- Execute flows by orchestrating node executions
-- Manage flow parameters and node connections
-- Track flow execution status
+## Service Definition
 
-### AWyes Client Service
-The client service focuses on node execution:
-- Execute individual infrastructure nodes
-- Report supported node types
-- Handle streaming execution requests
-- Return execution results
+The service is defined in `proto/awyes.proto` and includes:
 
-## Service Definitions
+### Core Types
 
-### AWyes Service (`proto/awyes.proto`)
-The main service includes:
-- `CreateFlow`: Create a new flow
-- `GetFlow`: Retrieve a specific flow
-- `ListFlows`: List all flows
-- `DeleteFlow`: Delete a flow
-- `ExecuteFlow`: Execute a flow by orchestrating node executions
+#### Node
 
-### AWyes Client Service (`proto/awyes_client.proto`)
-The client service includes:
-- `GetSupportedNodes`: List supported node types
-- `ExecuteNode`: Execute a single node
-- `HandleNodeExecutions`: Stream for handling node execution requests
-
-## Installation
-
-```bash
-npm install awyes
-```
-
-## Usage
-
-### Main Service Implementation
-
-```typescript
-import { AwyesService } from 'awyes';
-
-class MyAwyesService implements AwyesService {
-  async createFlow(request: CreateFlowRequest): Promise<CreateFlowResponse> {
-    // Implement flow creation
-  }
-
-  async executeFlow(request: ExecuteFlowRequest): Promise<ExecuteFlowResponse> {
-    // Orchestrate flow execution by calling client services
-  }
-
-  // ... other flow management methods
+```protobuf
+message Node {
+  string id = 1;
+  string context = 2;
+  string name = 3;
+  string description = 4;
+  repeated Parameter parameters = 5;
+  repeated Return returns = 6;
 }
 ```
 
-### Client Service Implementation
+#### Flow
 
-```typescript
-import { AwyesClientService } from 'awyes/client';
-
-class MyAwyesClientService implements AwyesClientService {
-  async getSupportedNodes(): Promise<GetSupportedNodesResponse> {
-    // Return list of supported node types
-    return {
-      nodes: [
-        {
-          type: 'cookbook/aws/infra/getInfra',
-          description: 'Retrieves infrastructure details',
-          parameters: [],
-          returns: [
-            { name: 'vpcs', type: 'Vpc[]' },
-            { name: 'subnets', type: 'Subnet[]' }
-          ]
-        }
-      ]
-    };
-  }
-
-  async executeNode(request: ExecuteNodeRequest): Promise<ExecuteNodeResponse> {
-    // Execute the requested node type
-    const { type, parameters } = request;
-    // ... implement node execution
-    return {
-      results: { /* execution results */ }
-    };
-  }
-
-  async *handleNodeExecutions(requests: AsyncIterable<ExecuteNodeRequest>): AsyncIterable<ExecuteNodeResponse> {
-    // Handle streaming execution requests
-    for await (const request of requests) {
-      yield await this.executeNode(request);
-    }
-  }
+```protobuf
+message Flow {
+  string id = 1;
+  string name = 2;
+  string context = 3;
+  int32 version = 4;
+  string description = 5;
+  repeated Node nodes = 6;
+  repeated Edge edges = 7;
+  repeated Parameter parameters = 8;
 }
 ```
 
-### Client Usage
+### RPCs
 
-```typescript
-import { AwyesClient } from 'awyes';
-import { AwyesClientClient } from 'awyes/client';
+- `RegisterFlow`: Register a new flow definition
+- `ExecuteFlow`: Execute a flow and stream responses
+- `RegisterNode`: Register a new node type
+- `RunAndWait`: Bidirectional streaming for execution monitoring
 
-// Connect to services
-const awyesClient = new AwyesClient('localhost:50051');
-const nodeClient = new AwyesClientClient('localhost:50052');
+### Event Types
 
-// Get supported nodes
-const { nodes } = await nodeClient.getSupportedNodes({});
+The service uses event streaming with the following types:
 
-// Create a flow using supported node types
-const flow = await awyesClient.createFlow({
-  flow: {
-    name: 'my-flow',
-    nodes: [
-      {
-        id: '1',
-        type: nodes[0].type,
-        parameters: []
-      }
-    ],
-    edges: []
-  }
-});
-
-// Execute the flow
-const result = await awyesClient.executeFlow({
-  id: flow.id,
-  parameters: {}
-});
-```
-
-## Development
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Generate TypeScript definitions from proto:
-```bash
-npm run build:proto
-```
-
-3. Build the project:
-```bash
-npm run build
-```
-
-## License
-
-ISC 
+- `UNKNOWN`: Default state
+- `LISTENING`: Service is ready and listening
+- `EXECUTING`: Operation in progress
+- `COMPLETED`: Operation completed successfully
+- `FAILED`: Operation failed with error

@@ -2,31 +2,38 @@ syntax = "proto3";
 
 package awyes;
 
-// Node parameter definition
+option go_package = "github.com/the-sage-group/awyes/proto";
+
+// Node definition
 message Parameter {
   string name = 1;
   string type = 2;
   optional string value = 3;
 }
 
-// Node return definition
 message Return {
   string name = 1;
   string type = 2;
   optional string value = 3;
 }
 
-// Node definition
 message Node {
   string id = 1;
   string context = 2;
   string name = 3;
-  string description = 4;
-  repeated Parameter parameters = 5;
-  repeated Return returns = 6;
+  int32 version = 4;
+  string description = 5;
+  repeated Parameter parameters = 6;
+  repeated Return returns = 7;
 }
 
 // Flow definition
+message Edge {
+  string id = 1;
+  string source = 2;
+  string target = 3;
+}
+
 message Flow {
   string id = 1;
   string name = 2;
@@ -38,39 +45,40 @@ message Flow {
   repeated Parameter parameters = 8;
 }
 
-// Edge definition
-message Edge {
-  string id = 1;
-  string source = 2;
-  string target = 3;
+// Event types for streaming execution updates
+enum EventType {
+  UNKNOWN = 0;
+  LISTENING = 1;
+  EXECUTING = 2;
+  COMPLETED = 3;
+  FAILED = 4;
+}
+
+// Event message for streaming execution updates
+message Event {
+  EventType type = 1;
+  optional Node node = 2;
+  optional string message = 3;
+  optional string error = 4;
+  int64 timestamp = 5;
 }
 
 // Request to register a new flow
 message RegisterFlowRequest { Flow flow = 1; }
-
-// Response after registering a flow
 message RegisterFlowResponse { Flow flow = 1; }
 
 // Request to register a new node
 message RegisterNodeRequest { Node node = 1; }
-
-// Response after registering a node
 message RegisterNodeResponse { Node node = 1; }
 
 // Request to execute a flow
 message ExecuteFlowRequest { Flow flow = 1; }
-
-// Response from flow execution
 message ExecuteFlowResponse { Node node = 1; }
 
 // AWyes Service definition
 service AwyesService {
-  // Register a new flow
   rpc RegisterFlow(RegisterFlowRequest) returns (RegisterFlowResponse) {}
-
-  // Register a new node
-  rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse) {}
-
-  // Execute a flow with parameters and stream results
   rpc ExecuteFlow(ExecuteFlowRequest) returns (stream ExecuteFlowResponse) {}
+  rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse) {}
+  rpc RunAndWait(stream Event) returns (stream Event) {}
 }
