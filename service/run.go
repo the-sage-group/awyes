@@ -7,7 +7,7 @@ import (
 )
 
 // RunAndWait handles bidirectional event streaming
-func (s *Service) RunAndWait(stream pb.AwyesService_RunAndWaitServer) error {
+func (s *Service) RunAndWait(stream pb.Awyes_RunAndWaitServer) error {
 	// Stub: Echo back events with updated timestamp
 	for {
 		event, err := stream.Recv()

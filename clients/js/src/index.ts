@@ -1,26 +1,24 @@
-import {
-    Node,
-    Flow,
-    Parameter,
-    Return,
-    Edge,
-    Event,
-    EventType,
-    AwyesServiceClient,
-} from './generated/awyes';
+import { credentials } from "@grpc/grpc-js";
 
-// Re-export common types
+import {
+  Node,
+  Flow,
+  Edge,
+  Event,
+  EventType,
+  RegisterNodeRequest,
+  RegisterNodeResponse,
+  AwyesClient,
+} from "./generated/proto/awyes";
+
 export type {
-    Node,
-    Flow,
-    Parameter,
-    Return,
-    Edge,
-    Event,
+  Node,
+  Flow,
+  Edge,
+  Event,
+  EventType,
+  RegisterNodeRequest,
+  RegisterNodeResponse,
 };
 
-// Re-export enums
-export { EventType };
-
-// Re-export client
-export { AwyesServiceClient }; 
+export { AwyesClient, credentials };

@@ -5,7 +5,7 @@ import (
 )
 
 type Service struct {
-	pb.UnimplementedAwyesServiceServer
+	pb.UnimplementedAwyesServer
 }
 
 func New() *Service {

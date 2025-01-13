@@ -7,9 +7,12 @@ setup:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 proto: setup
+	# Generate Go files
 	protoc --go_out=. --go_opt=paths=source_relative \
 		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 		proto/awyes.proto
+	# Generate TypeScript files
+	cd clients/js && npm run build:proto
 
 build:
 	go build -o bin/server main.go
@@ -19,4 +22,5 @@ run: build
 
 clean:
 	rm -rf bin/
-	rm -f proto/*.pb.go 
+	rm -f proto/*.pb.go
+	cd clients/js && npm run clean 

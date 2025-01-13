@@ -15,7 +15,7 @@ func (s *Service) RegisterFlow(ctx context.Context, req *pb.RegisterFlowRequest)
 }
 
 // ExecuteFlow executes a flow and streams back node results
-func (s *Service) ExecuteFlow(req *pb.ExecuteFlowRequest, stream pb.AwyesService_ExecuteFlowServer) error {
+func (s *Service) ExecuteFlow(req *pb.ExecuteFlowRequest, stream pb.Awyes_ExecuteFlowServer) error {
 	// Stub: Stream back each node in the flow
 
 	return nil

@@ -19,7 +19,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	proto.RegisterAwyesServiceServer(s, service.New())
+	proto.RegisterAwyesServer(s, service.New())
 
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
