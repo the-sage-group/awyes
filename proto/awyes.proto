@@ -16,12 +16,13 @@ message Node {
   google.protobuf.Struct returns = 6;
 }
 
-// Flow definition
+// Edge definition
 message Edge {
   string source = 1;
   string target = 2;
 }
 
+// Flow definition
 message Flow {
   string name = 1;
   string context = 2;
@@ -30,6 +31,14 @@ message Flow {
   repeated Node nodes = 5;
   repeated Edge edges = 6;
   google.protobuf.Struct parameters = 7;
+}
+
+// Journey definition
+message Journey {
+  string id = 1;
+  Flow flow = 2;
+  Node node = 3;
+  google.protobuf.Struct state = 4;
 }
 
 // Event types for streaming execution updates
@@ -60,10 +69,15 @@ message RegisterNodeResponse { Node node = 1; }
 
 // Request to execute a flow
 message ExecuteFlowRequest { Flow flow = 1; }
-message ExecuteFlowResponse { Node node = 1; }
+message ExecuteFlowResponse { Journey journey = 1; }
+
+// Request to list nodes
+message ListNodesRequest {}
+message ListNodesResponse { repeated Node nodes = 1; }
 
 // Awyes definition
 service Awyes {
+  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {}
   rpc RegisterFlow(RegisterFlowRequest) returns (RegisterFlowResponse) {}
   rpc ExecuteFlow(ExecuteFlowRequest) returns (stream ExecuteFlowResponse) {}
   rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse) {}

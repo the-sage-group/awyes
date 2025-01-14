@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/the-sage-group/awyes/proto"
 	"github.com/the-sage-group/awyes/service"
@@ -20,6 +21,7 @@ func main() {
 
 	s := grpc.NewServer()
 	proto.RegisterAwyesServer(s, service.New())
+	reflection.Register(s)
 
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {

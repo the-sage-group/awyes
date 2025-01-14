@@ -1,0 +1,39 @@
+{
+  "name": "@the-sage-group/awyes-web",
+  "version": "0.1.1",
+  "main": "src/index.ts",
+  "description": "Web browser client for awyes gRPC service",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-sage-group/awyes.git"
+  },
+  "keywords": [
+    "grpc-web",
+    "client",
+    "typescript",
+    "infrastructure",
+    "automation",
+    "browser"
+  ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build:proto": "mkdir -p ./src/generated && protoc --ts_out ./src/generated --ts_opt long_type_string --proto_path ../../proto ../../proto/awyes.proto"
+  },
+  "dependencies": {
+    "@protobuf-ts/grpcweb-transport": "^2.9.4",
+    "@protobuf-ts/plugin": "^2.9.4",
+    "@protobuf-ts/runtime": "^2.9.4",
+    "@protobuf-ts/runtime-rpc": "^2.9.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "author": "trumanpurnell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/the-sage-group/awyes/issues"
+  }
+}

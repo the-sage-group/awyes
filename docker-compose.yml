@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  awyes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    volumes:
+      - .:/app
+      - go-mod-cache:/go/pkg/mod
+    restart: unless-stopped
+    networks:
+      - awyes-net
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+          ignore:
+            - .git/
+            - clients/
+            - proxy/
+            - bin/
+            - "*.md"
+        - action: sync+restart
+          path: proto/
+          target: /app/proto/
+
+  envoy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    networks:
+      - awyes-net
+    depends_on:
+      - awyes
+
+networks:
+  awyes-net:
+    driver: bridge
+
+volumes:
+  go-mod-cache:
