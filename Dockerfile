@@ -1,7 +1,7 @@
 FROM golang:1.21-alpine
 
 # Install build dependencies
-RUN apk add --no-cache git make protoc protobuf-dev
+RUN apk add --no-cache protoc protobuf-dev
 
 # Install protoc plugins
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
@@ -15,8 +15,11 @@ COPY go.mod go.sum ./
 # Download dependencies
 RUN go mod download
 
+# Copy source code
+COPY . .
+
 # Expose gRPC port
 EXPOSE 50051
 
-# Default to running the server
+# Run the server
 CMD ["go", "run", "main.go"] 

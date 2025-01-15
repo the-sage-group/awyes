@@ -30,11 +30,7 @@ clean:
 	docker compose down -v
 
 # Docker commands
-dev:
-	docker compose watch
-
-prod:
-	docker compose up -d --build
-
+up:
+	docker compose up --build
 down:
 	docker compose down

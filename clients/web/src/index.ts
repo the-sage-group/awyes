@@ -13,10 +13,15 @@ export type {
   ExecuteFlowResponse,
   ListNodesRequest,
   ListNodesResponse,
+  ListFlowsRequest,
+  ListFlowsResponse,
 } from "./generated/awyes";
-
-// Export enums
 export { EventType } from "./generated/awyes";
 
-// Export the client class and default instance
+export {
+  FieldDescriptorProto_Type,
+  FieldDescriptorProto_Label,
+} from "./generated/google/protobuf/descriptor";
+export type { FieldDescriptorProto } from "./generated/google/protobuf/descriptor";
+
 export { AwyesClient } from "./generated/awyes.client";

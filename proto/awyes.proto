@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/struct.proto";
+import "google/protobuf/descriptor.proto";
 
 package awyes;
 
@@ -8,29 +9,32 @@ option go_package = "github.com/the-sage-group/awyes/proto";
 
 // Node definition
 message Node {
-  string name = 1;
-  string context = 2;
-  int32 version = 3;
-  string description = 4;
-  google.protobuf.Struct parameters = 5;
-  google.protobuf.Struct returns = 6;
+  string id = 1;
+  string name = 2;
+  string context = 3;
+  int32 version = 4;
+  string description = 5;
+  repeated google.protobuf.FieldDescriptorProto parameters = 6;
+  repeated google.protobuf.FieldDescriptorProto returns = 7;
 }
 
 // Edge definition
 message Edge {
-  string source = 1;
-  string target = 2;
+  string id = 1;
+  string source = 2;
+  string target = 3;
 }
 
 // Flow definition
 message Flow {
-  string name = 1;
-  string context = 2;
-  int32 version = 3;
-  string description = 4;
-  repeated Node nodes = 5;
-  repeated Edge edges = 6;
-  google.protobuf.Struct parameters = 7;
+  string id = 1;
+  string name = 2;
+  string context = 3;
+  int32 version = 4;
+  string description = 5;
+  repeated Node nodes = 6;
+  repeated Edge edges = 7;
+  repeated google.protobuf.FieldDescriptorProto parameters = 8;
 }
 
 // Journey definition
@@ -38,7 +42,7 @@ message Journey {
   string id = 1;
   Flow flow = 2;
   Node node = 3;
-  google.protobuf.Struct state = 4;
+  map<string, google.protobuf.Value> state = 4;
 }
 
 // Event types for streaming execution updates
@@ -54,9 +58,10 @@ enum EventType {
 message Event {
   EventType type = 1;
   optional Node node = 2;
-  optional string message = 3;
-  optional string error = 4;
-  int64 timestamp = 5;
+  map<string, google.protobuf.Value> state = 3;
+  optional string message = 4;
+  optional string error = 5;
+  int64 timestamp = 6;
 }
 
 // Request to register a new flow
@@ -75,9 +80,14 @@ message ExecuteFlowResponse { Journey journey = 1; }
 message ListNodesRequest {}
 message ListNodesResponse { repeated Node nodes = 1; }
 
+// Request to list flows
+message ListFlowsRequest {}
+message ListFlowsResponse { repeated Flow flows = 1; }
+
 // Awyes definition
 service Awyes {
   rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {}
+  rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {}
   rpc RegisterFlow(RegisterFlowRequest) returns (RegisterFlowResponse) {}
   rpc ExecuteFlow(ExecuteFlowRequest) returns (stream ExecuteFlowResponse) {}
   rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse) {}

@@ -11,7 +11,8 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Struct } from "./google/protobuf/struct";
+import { Value } from "./google/protobuf/struct";
+import { FieldDescriptorProto } from "./google/protobuf/descriptor";
 /**
  * Node definition
  *
@@ -19,29 +20,33 @@ import { Struct } from "./google/protobuf/struct";
  */
 export interface Node {
     /**
-     * @generated from protobuf field: string name = 1;
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string name = 2;
      */
     name: string;
     /**
-     * @generated from protobuf field: string context = 2;
+     * @generated from protobuf field: string context = 3;
      */
     context: string;
     /**
-     * @generated from protobuf field: int32 version = 3;
+     * @generated from protobuf field: int32 version = 4;
      */
     version: number;
     /**
-     * @generated from protobuf field: string description = 4;
+     * @generated from protobuf field: string description = 5;
      */
     description: string;
     /**
-     * @generated from protobuf field: google.protobuf.Struct parameters = 5;
+     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameters = 6;
      */
-    parameters?: Struct;
+    parameters: FieldDescriptorProto[];
     /**
-     * @generated from protobuf field: google.protobuf.Struct returns = 6;
+     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto returns = 7;
      */
-    returns?: Struct;
+    returns: FieldDescriptorProto[];
 }
 /**
  * Edge definition
@@ -50,11 +55,15 @@ export interface Node {
  */
 export interface Edge {
     /**
-     * @generated from protobuf field: string source = 1;
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string source = 2;
      */
     source: string;
     /**
-     * @generated from protobuf field: string target = 2;
+     * @generated from protobuf field: string target = 3;
      */
     target: string;
 }
@@ -65,33 +74,37 @@ export interface Edge {
  */
 export interface Flow {
     /**
-     * @generated from protobuf field: string name = 1;
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string name = 2;
      */
     name: string;
     /**
-     * @generated from protobuf field: string context = 2;
+     * @generated from protobuf field: string context = 3;
      */
     context: string;
     /**
-     * @generated from protobuf field: int32 version = 3;
+     * @generated from protobuf field: int32 version = 4;
      */
     version: number;
     /**
-     * @generated from protobuf field: string description = 4;
+     * @generated from protobuf field: string description = 5;
      */
     description: string;
     /**
-     * @generated from protobuf field: repeated awyes.Node nodes = 5;
+     * @generated from protobuf field: repeated awyes.Node nodes = 6;
      */
     nodes: Node[];
     /**
-     * @generated from protobuf field: repeated awyes.Edge edges = 6;
+     * @generated from protobuf field: repeated awyes.Edge edges = 7;
      */
     edges: Edge[];
     /**
-     * @generated from protobuf field: google.protobuf.Struct parameters = 7;
+     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameters = 8;
      */
-    parameters?: Struct;
+    parameters: FieldDescriptorProto[];
 }
 /**
  * Journey definition
@@ -112,9 +125,11 @@ export interface Journey {
      */
     node?: Node;
     /**
-     * @generated from protobuf field: google.protobuf.Struct state = 4;
+     * @generated from protobuf field: map<string, google.protobuf.Value> state = 4;
      */
-    state?: Struct;
+    state: {
+        [key: string]: Value;
+    };
 }
 /**
  * Event message for streaming execution updates
@@ -131,15 +146,21 @@ export interface Event {
      */
     node?: Node;
     /**
-     * @generated from protobuf field: optional string message = 3;
+     * @generated from protobuf field: map<string, google.protobuf.Value> state = 3;
+     */
+    state: {
+        [key: string]: Value;
+    };
+    /**
+     * @generated from protobuf field: optional string message = 4;
      */
     message?: string;
     /**
-     * @generated from protobuf field: optional string error = 4;
+     * @generated from protobuf field: optional string error = 5;
      */
     error?: string;
     /**
-     * @generated from protobuf field: int64 timestamp = 5;
+     * @generated from protobuf field: int64 timestamp = 6;
      */
     timestamp: string;
 }
@@ -220,6 +241,22 @@ export interface ListNodesResponse {
     nodes: Node[];
 }
 /**
+ * Request to list flows
+ *
+ * @generated from protobuf message awyes.ListFlowsRequest
+ */
+export interface ListFlowsRequest {
+}
+/**
+ * @generated from protobuf message awyes.ListFlowsResponse
+ */
+export interface ListFlowsResponse {
+    /**
+     * @generated from protobuf field: repeated awyes.Flow flows = 1;
+     */
+    flows: Flow[];
+}
+/**
  * Event types for streaming execution updates
  *
  * @generated from protobuf enum awyes.EventType
@@ -250,20 +287,24 @@ export enum EventType {
 class Node$Type extends MessageType<Node> {
     constructor() {
         super("awyes.Node", [
-            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "context", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "version", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "parameters", kind: "message", T: () => Struct },
-            { no: 6, name: "returns", kind: "message", T: () => Struct }
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "context", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "version", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto },
+            { no: 7, name: "returns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
         ]);
     }
     create(value?: PartialMessage<Node>): Node {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
         message.name = "";
         message.context = "";
         message.version = 0;
         message.description = "";
+        message.parameters = [];
+        message.returns = [];
         if (value !== undefined)
             reflectionMergePartial<Node>(this, message, value);
         return message;
@@ -273,23 +314,26 @@ class Node$Type extends MessageType<Node> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string name */ 1:
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string name */ 2:
                     message.name = reader.string();
                     break;
-                case /* string context */ 2:
+                case /* string context */ 3:
                     message.context = reader.string();
                     break;
-                case /* int32 version */ 3:
+                case /* int32 version */ 4:
                     message.version = reader.int32();
                     break;
-                case /* string description */ 4:
+                case /* string description */ 5:
                     message.description = reader.string();
                     break;
-                case /* google.protobuf.Struct parameters */ 5:
-                    message.parameters = Struct.internalBinaryRead(reader, reader.uint32(), options, message.parameters);
+                case /* repeated google.protobuf.FieldDescriptorProto parameters */ 6:
+                    message.parameters.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* google.protobuf.Struct returns */ 6:
-                    message.returns = Struct.internalBinaryRead(reader, reader.uint32(), options, message.returns);
+                case /* repeated google.protobuf.FieldDescriptorProto returns */ 7:
+                    message.returns.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -303,24 +347,27 @@ class Node$Type extends MessageType<Node> {
         return message;
     }
     internalBinaryWrite(message: Node, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string name = 1; */
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string name = 2; */
         if (message.name !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.name);
-        /* string context = 2; */
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* string context = 3; */
         if (message.context !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.context);
-        /* int32 version = 3; */
+            writer.tag(3, WireType.LengthDelimited).string(message.context);
+        /* int32 version = 4; */
         if (message.version !== 0)
-            writer.tag(3, WireType.Varint).int32(message.version);
-        /* string description = 4; */
+            writer.tag(4, WireType.Varint).int32(message.version);
+        /* string description = 5; */
         if (message.description !== "")
-            writer.tag(4, WireType.LengthDelimited).string(message.description);
-        /* google.protobuf.Struct parameters = 5; */
-        if (message.parameters)
-            Struct.internalBinaryWrite(message.parameters, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* google.protobuf.Struct returns = 6; */
-        if (message.returns)
-            Struct.internalBinaryWrite(message.returns, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+            writer.tag(5, WireType.LengthDelimited).string(message.description);
+        /* repeated google.protobuf.FieldDescriptorProto parameters = 6; */
+        for (let i = 0; i < message.parameters.length; i++)
+            FieldDescriptorProto.internalBinaryWrite(message.parameters[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* repeated google.protobuf.FieldDescriptorProto returns = 7; */
+        for (let i = 0; i < message.returns.length; i++)
+            FieldDescriptorProto.internalBinaryWrite(message.returns[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -335,12 +382,14 @@ export const Node = new Node$Type();
 class Edge$Type extends MessageType<Edge> {
     constructor() {
         super("awyes.Edge", [
-            { no: 1, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "target", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "target", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<Edge>): Edge {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
         message.source = "";
         message.target = "";
         if (value !== undefined)
@@ -352,10 +401,13 @@ class Edge$Type extends MessageType<Edge> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string source */ 1:
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string source */ 2:
                     message.source = reader.string();
                     break;
-                case /* string target */ 2:
+                case /* string target */ 3:
                     message.target = reader.string();
                     break;
                 default:
@@ -370,12 +422,15 @@ class Edge$Type extends MessageType<Edge> {
         return message;
     }
     internalBinaryWrite(message: Edge, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string source = 1; */
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string source = 2; */
         if (message.source !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.source);
-        /* string target = 2; */
+            writer.tag(2, WireType.LengthDelimited).string(message.source);
+        /* string target = 3; */
         if (message.target !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.target);
+            writer.tag(3, WireType.LengthDelimited).string(message.target);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -390,23 +445,26 @@ export const Edge = new Edge$Type();
 class Flow$Type extends MessageType<Flow> {
     constructor() {
         super("awyes.Flow", [
-            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "context", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "version", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "nodes", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Node },
-            { no: 6, name: "edges", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Edge },
-            { no: 7, name: "parameters", kind: "message", T: () => Struct }
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "context", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "version", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "nodes", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Node },
+            { no: 7, name: "edges", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Edge },
+            { no: 8, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
         ]);
     }
     create(value?: PartialMessage<Flow>): Flow {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
         message.name = "";
         message.context = "";
         message.version = 0;
         message.description = "";
         message.nodes = [];
         message.edges = [];
+        message.parameters = [];
         if (value !== undefined)
             reflectionMergePartial<Flow>(this, message, value);
         return message;
@@ -416,26 +474,29 @@ class Flow$Type extends MessageType<Flow> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string name */ 1:
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string name */ 2:
                     message.name = reader.string();
                     break;
-                case /* string context */ 2:
+                case /* string context */ 3:
                     message.context = reader.string();
                     break;
-                case /* int32 version */ 3:
+                case /* int32 version */ 4:
                     message.version = reader.int32();
                     break;
-                case /* string description */ 4:
+                case /* string description */ 5:
                     message.description = reader.string();
                     break;
-                case /* repeated awyes.Node nodes */ 5:
+                case /* repeated awyes.Node nodes */ 6:
                     message.nodes.push(Node.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated awyes.Edge edges */ 6:
+                case /* repeated awyes.Edge edges */ 7:
                     message.edges.push(Edge.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* google.protobuf.Struct parameters */ 7:
-                    message.parameters = Struct.internalBinaryRead(reader, reader.uint32(), options, message.parameters);
+                case /* repeated google.protobuf.FieldDescriptorProto parameters */ 8:
+                    message.parameters.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -449,27 +510,30 @@ class Flow$Type extends MessageType<Flow> {
         return message;
     }
     internalBinaryWrite(message: Flow, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string name = 1; */
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string name = 2; */
         if (message.name !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.name);
-        /* string context = 2; */
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* string context = 3; */
         if (message.context !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.context);
-        /* int32 version = 3; */
+            writer.tag(3, WireType.LengthDelimited).string(message.context);
+        /* int32 version = 4; */
         if (message.version !== 0)
-            writer.tag(3, WireType.Varint).int32(message.version);
-        /* string description = 4; */
+            writer.tag(4, WireType.Varint).int32(message.version);
+        /* string description = 5; */
         if (message.description !== "")
-            writer.tag(4, WireType.LengthDelimited).string(message.description);
-        /* repeated awyes.Node nodes = 5; */
+            writer.tag(5, WireType.LengthDelimited).string(message.description);
+        /* repeated awyes.Node nodes = 6; */
         for (let i = 0; i < message.nodes.length; i++)
-            Node.internalBinaryWrite(message.nodes[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* repeated awyes.Edge edges = 6; */
+            Node.internalBinaryWrite(message.nodes[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* repeated awyes.Edge edges = 7; */
         for (let i = 0; i < message.edges.length; i++)
-            Edge.internalBinaryWrite(message.edges[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* google.protobuf.Struct parameters = 7; */
-        if (message.parameters)
-            Struct.internalBinaryWrite(message.parameters, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+            Edge.internalBinaryWrite(message.edges[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* repeated google.protobuf.FieldDescriptorProto parameters = 8; */
+        for (let i = 0; i < message.parameters.length; i++)
+            FieldDescriptorProto.internalBinaryWrite(message.parameters[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -487,12 +551,13 @@ class Journey$Type extends MessageType<Journey> {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "flow", kind: "message", T: () => Flow },
             { no: 3, name: "node", kind: "message", T: () => Node },
-            { no: 4, name: "state", kind: "message", T: () => Struct }
+            { no: 4, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
         ]);
     }
     create(value?: PartialMessage<Journey>): Journey {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.id = "";
+        message.state = {};
         if (value !== undefined)
             reflectionMergePartial<Journey>(this, message, value);
         return message;
@@ -511,8 +576,8 @@ class Journey$Type extends MessageType<Journey> {
                 case /* awyes.Node node */ 3:
                     message.node = Node.internalBinaryRead(reader, reader.uint32(), options, message.node);
                     break;
-                case /* google.protobuf.Struct state */ 4:
-                    message.state = Struct.internalBinaryRead(reader, reader.uint32(), options, message.state);
+                case /* map<string, google.protobuf.Value> state */ 4:
+                    this.binaryReadMap4(message.state, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -525,6 +590,22 @@ class Journey$Type extends MessageType<Journey> {
         }
         return message;
     }
+    private binaryReadMap4(map: Journey["state"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof Journey["state"] | undefined, val: Journey["state"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = Value.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field awyes.Journey.state");
+            }
+        }
+        map[key ?? ""] = val ?? Value.create();
+    }
     internalBinaryWrite(message: Journey, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string id = 1; */
         if (message.id !== "")
@@ -535,9 +616,13 @@ class Journey$Type extends MessageType<Journey> {
         /* awyes.Node node = 3; */
         if (message.node)
             Node.internalBinaryWrite(message.node, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* google.protobuf.Struct state = 4; */
-        if (message.state)
-            Struct.internalBinaryWrite(message.state, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, google.protobuf.Value> state = 4; */
+        for (let k of globalThis.Object.keys(message.state)) {
+            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            Value.internalBinaryWrite(message.state[k], writer, options);
+            writer.join().join();
+        }
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -554,14 +639,16 @@ class Event$Type extends MessageType<Event> {
         super("awyes.Event", [
             { no: 1, name: "type", kind: "enum", T: () => ["awyes.EventType", EventType] },
             { no: 2, name: "node", kind: "message", T: () => Node },
-            { no: 3, name: "message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "error", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "timestamp", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+            { no: 3, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } },
+            { no: 4, name: "message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "error", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "timestamp", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
         ]);
     }
     create(value?: PartialMessage<Event>): Event {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.type = 0;
+        message.state = {};
         message.timestamp = "0";
         if (value !== undefined)
             reflectionMergePartial<Event>(this, message, value);
@@ -578,13 +665,16 @@ class Event$Type extends MessageType<Event> {
                 case /* optional awyes.Node node */ 2:
                     message.node = Node.internalBinaryRead(reader, reader.uint32(), options, message.node);
                     break;
-                case /* optional string message */ 3:
+                case /* map<string, google.protobuf.Value> state */ 3:
+                    this.binaryReadMap3(message.state, reader, options);
+                    break;
+                case /* optional string message */ 4:
                     message.message = reader.string();
                     break;
-                case /* optional string error */ 4:
+                case /* optional string error */ 5:
                     message.error = reader.string();
                     break;
-                case /* int64 timestamp */ 5:
+                case /* int64 timestamp */ 6:
                     message.timestamp = reader.int64().toString();
                     break;
                 default:
@@ -598,6 +688,22 @@ class Event$Type extends MessageType<Event> {
         }
         return message;
     }
+    private binaryReadMap3(map: Event["state"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof Event["state"] | undefined, val: Event["state"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = Value.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field awyes.Event.state");
+            }
+        }
+        map[key ?? ""] = val ?? Value.create();
+    }
     internalBinaryWrite(message: Event, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* awyes.EventType type = 1; */
         if (message.type !== 0)
@@ -605,15 +711,22 @@ class Event$Type extends MessageType<Event> {
         /* optional awyes.Node node = 2; */
         if (message.node)
             Node.internalBinaryWrite(message.node, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* optional string message = 3; */
+        /* map<string, google.protobuf.Value> state = 3; */
+        for (let k of globalThis.Object.keys(message.state)) {
+            writer.tag(3, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            Value.internalBinaryWrite(message.state[k], writer, options);
+            writer.join().join();
+        }
+        /* optional string message = 4; */
         if (message.message !== undefined)
-            writer.tag(3, WireType.LengthDelimited).string(message.message);
-        /* optional string error = 4; */
+            writer.tag(4, WireType.LengthDelimited).string(message.message);
+        /* optional string error = 5; */
         if (message.error !== undefined)
-            writer.tag(4, WireType.LengthDelimited).string(message.error);
-        /* int64 timestamp = 5; */
+            writer.tag(5, WireType.LengthDelimited).string(message.error);
+        /* int64 timestamp = 6; */
         if (message.timestamp !== "0")
-            writer.tag(5, WireType.Varint).int64(message.timestamp);
+            writer.tag(6, WireType.Varint).int64(message.timestamp);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -972,11 +1085,84 @@ class ListNodesResponse$Type extends MessageType<ListNodesResponse> {
  * @generated MessageType for protobuf message awyes.ListNodesResponse
  */
 export const ListNodesResponse = new ListNodesResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListFlowsRequest$Type extends MessageType<ListFlowsRequest> {
+    constructor() {
+        super("awyes.ListFlowsRequest", []);
+    }
+    create(value?: PartialMessage<ListFlowsRequest>): ListFlowsRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<ListFlowsRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListFlowsRequest): ListFlowsRequest {
+        return target ?? this.create();
+    }
+    internalBinaryWrite(message: ListFlowsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message awyes.ListFlowsRequest
+ */
+export const ListFlowsRequest = new ListFlowsRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListFlowsResponse$Type extends MessageType<ListFlowsResponse> {
+    constructor() {
+        super("awyes.ListFlowsResponse", [
+            { no: 1, name: "flows", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Flow }
+        ]);
+    }
+    create(value?: PartialMessage<ListFlowsResponse>): ListFlowsResponse {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.flows = [];
+        if (value !== undefined)
+            reflectionMergePartial<ListFlowsResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListFlowsResponse): ListFlowsResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated awyes.Flow flows */ 1:
+                    message.flows.push(Flow.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ListFlowsResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated awyes.Flow flows = 1; */
+        for (let i = 0; i < message.flows.length; i++)
+            Flow.internalBinaryWrite(message.flows[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message awyes.ListFlowsResponse
+ */
+export const ListFlowsResponse = new ListFlowsResponse$Type();
 /**
  * @generated ServiceType for protobuf service awyes.Awyes
  */
 export const Awyes = new ServiceType("awyes.Awyes", [
     { name: "ListNodes", options: {}, I: ListNodesRequest, O: ListNodesResponse },
+    { name: "ListFlows", options: {}, I: ListFlowsRequest, O: ListFlowsResponse },
     { name: "RegisterFlow", options: {}, I: RegisterFlowRequest, O: RegisterFlowResponse },
     { name: "ExecuteFlow", serverStreaming: true, options: {}, I: ExecuteFlowRequest, O: ExecuteFlowResponse },
     { name: "RegisterNode", options: {}, I: RegisterNodeRequest, O: RegisterNodeResponse },
