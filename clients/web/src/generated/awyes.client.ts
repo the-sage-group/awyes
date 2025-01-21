@@ -10,7 +10,6 @@ import type { RegisterNodeResponse } from "./awyes";
 import type { RegisterNodeRequest } from "./awyes";
 import type { ExecuteFlowResponse } from "./awyes";
 import type { ExecuteFlowRequest } from "./awyes";
-import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { RegisterFlowResponse } from "./awyes";
 import type { RegisterFlowRequest } from "./awyes";
 import type { ListFlowsResponse } from "./awyes";
@@ -39,9 +38,9 @@ export interface IAwyesClient {
      */
     registerFlow(input: RegisterFlowRequest, options?: RpcOptions): UnaryCall<RegisterFlowRequest, RegisterFlowResponse>;
     /**
-     * @generated from protobuf rpc: ExecuteFlow(awyes.ExecuteFlowRequest) returns (stream awyes.ExecuteFlowResponse);
+     * @generated from protobuf rpc: ExecuteFlow(awyes.ExecuteFlowRequest) returns (awyes.ExecuteFlowResponse);
      */
-    executeFlow(input: ExecuteFlowRequest, options?: RpcOptions): ServerStreamingCall<ExecuteFlowRequest, ExecuteFlowResponse>;
+    executeFlow(input: ExecuteFlowRequest, options?: RpcOptions): UnaryCall<ExecuteFlowRequest, ExecuteFlowResponse>;
     /**
      * @generated from protobuf rpc: RegisterNode(awyes.RegisterNodeRequest) returns (awyes.RegisterNodeResponse);
      */
@@ -84,11 +83,11 @@ export class AwyesClient implements IAwyesClient, ServiceInfo {
         return stackIntercept<RegisterFlowRequest, RegisterFlowResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: ExecuteFlow(awyes.ExecuteFlowRequest) returns (stream awyes.ExecuteFlowResponse);
+     * @generated from protobuf rpc: ExecuteFlow(awyes.ExecuteFlowRequest) returns (awyes.ExecuteFlowResponse);
      */
-    executeFlow(input: ExecuteFlowRequest, options?: RpcOptions): ServerStreamingCall<ExecuteFlowRequest, ExecuteFlowResponse> {
+    executeFlow(input: ExecuteFlowRequest, options?: RpcOptions): UnaryCall<ExecuteFlowRequest, ExecuteFlowResponse> {
         const method = this.methods[3], opt = this._transport.mergeOptions(options);
-        return stackIntercept<ExecuteFlowRequest, ExecuteFlowResponse>("serverStreaming", this._transport, method, opt, input);
+        return stackIntercept<ExecuteFlowRequest, ExecuteFlowResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: RegisterNode(awyes.RegisterNodeRequest) returns (awyes.RegisterNodeResponse);

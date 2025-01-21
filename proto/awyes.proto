@@ -9,57 +9,52 @@ option go_package = "github.com/the-sage-group/awyes/proto";
 
 // Node definition
 message Node {
-  string id = 1;
-  string name = 2;
-  string context = 3;
-  int32 version = 4;
-  string description = 5;
-  repeated google.protobuf.FieldDescriptorProto parameters = 6;
-  repeated google.protobuf.FieldDescriptorProto returns = 7;
+  string name = 1;
+  string context = 2;
+  int32 version = 3;
+  string description = 4;
+  repeated google.protobuf.FieldDescriptorProto parameters = 5;
+  repeated google.protobuf.FieldDescriptorProto returns = 6;
 }
 
 // Edge definition
 message Edge {
-  string id = 1;
-  string source = 2;
-  string target = 3;
+  string source = 1;
+  string target = 2;
 }
 
 // Flow definition
 message Flow {
-  string id = 1;
-  string name = 2;
-  string context = 3;
-  int32 version = 4;
-  string description = 5;
-  repeated Node nodes = 6;
-  repeated Edge edges = 7;
-  repeated google.protobuf.FieldDescriptorProto parameters = 8;
+  string name = 1;
+  string context = 2;
+  int32 version = 3;
+  string description = 4;
+  repeated Node nodes = 5;
+  repeated Edge edges = 6;
+  repeated google.protobuf.FieldDescriptorProto parameters = 7;
 }
 
-// Journey definition
-message Journey {
+// Trip definition
+message Trip {
   string id = 1;
   Flow flow = 2;
-  Node node = 3;
-  map<string, google.protobuf.Value> state = 4;
+  map<string, google.protobuf.Value> state = 3;
 }
 
 // Event types for streaming execution updates
 enum EventType {
   UNKNOWN = 0;
-  LISTENING = 1;
-  EXECUTING = 2;
-  COMPLETED = 3;
-  FAILED = 4;
+  EXECUTING = 1;
+  COMPLETED = 2;
+  FAILED = 3;
 }
 
 // Event message for streaming execution updates
 message Event {
   EventType type = 1;
-  optional Node node = 2;
-  map<string, google.protobuf.Value> state = 3;
-  optional string message = 4;
+  Trip trip = 2;
+  Node node = 3;
+  string label = 4;
   optional string error = 5;
   int64 timestamp = 6;
 }
@@ -74,7 +69,7 @@ message RegisterNodeResponse { Node node = 1; }
 
 // Request to execute a flow
 message ExecuteFlowRequest { Flow flow = 1; }
-message ExecuteFlowResponse { Journey journey = 1; }
+message ExecuteFlowResponse { Trip trip = 1; }
 
 // Request to list nodes
 message ListNodesRequest {}
@@ -89,7 +84,7 @@ service Awyes {
   rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {}
   rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {}
   rpc RegisterFlow(RegisterFlowRequest) returns (RegisterFlowResponse) {}
-  rpc ExecuteFlow(ExecuteFlowRequest) returns (stream ExecuteFlowResponse) {}
+  rpc ExecuteFlow(ExecuteFlowRequest) returns (ExecuteFlowResponse) {}
   rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse) {}
   rpc RunAndWait(stream Event) returns (stream Event) {}
 }

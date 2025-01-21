@@ -30,7 +30,7 @@ clean:
 	docker compose down -v
 
 # Docker commands
-up:
+up: proto
 	docker compose up --build
 down:
 	docker compose down

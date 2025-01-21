@@ -3,14 +3,13 @@ export type {
   Flow,
   Edge,
   Event,
-  EventType,
   RegisterNodeRequest,
   RegisterNodeResponse,
   ListNodesRequest,
   ListNodesResponse,
 } from "./generated/proto/awyes";
 
-export { AwyesClient } from "./generated/proto/awyes";
+export { AwyesClient, EventType } from "./generated/proto/awyes";
 export { credentials } from "@grpc/grpc-js";
 
 export {
