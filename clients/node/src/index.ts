@@ -9,8 +9,8 @@ export type {
   ListNodesResponse,
 } from "./generated/proto/awyes";
 
-export { AwyesClient, EventType } from "./generated/proto/awyes";
-export { credentials } from "@grpc/grpc-js";
+export { AwyesClient, EventType, Label } from "./generated/proto/awyes";
+export { credentials, Metadata } from "@grpc/grpc-js";
 
 export {
   FieldDescriptorProto_Type,

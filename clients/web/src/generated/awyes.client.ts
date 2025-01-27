@@ -4,19 +4,23 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Awyes } from "./awyes";
-import type { Event } from "./awyes";
 import type { DuplexStreamingCall } from "@protobuf-ts/runtime-rpc";
-import type { RegisterNodeResponse } from "./awyes";
-import type { RegisterNodeRequest } from "./awyes";
-import type { ExecuteFlowResponse } from "./awyes";
-import type { ExecuteFlowRequest } from "./awyes";
-import type { RegisterFlowResponse } from "./awyes";
-import type { RegisterFlowRequest } from "./awyes";
-import type { ListFlowsResponse } from "./awyes";
-import type { ListFlowsRequest } from "./awyes";
+import type { ListTripsResponse } from "./awyes";
+import type { ListTripsRequest } from "./awyes";
+import type { Event } from "./awyes";
+import type { WatchTripRequest } from "./awyes";
+import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { StartTripResponse } from "./awyes";
+import type { StartTripRequest } from "./awyes";
+import type { ListRoutesResponse } from "./awyes";
+import type { ListRoutesRequest } from "./awyes";
+import type { RegisterRouteResponse } from "./awyes";
+import type { RegisterRouteRequest } from "./awyes";
+import type { ListHandlersResponse } from "./awyes";
+import type { ListHandlersRequest } from "./awyes";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
-import type { ListNodesResponse } from "./awyes";
-import type { ListNodesRequest } from "./awyes";
+import type { RegisterHandlerResponse } from "./awyes";
+import type { RegisterHandlerRequest } from "./awyes";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 /**
@@ -26,29 +30,37 @@ import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
  */
 export interface IAwyesClient {
     /**
-     * @generated from protobuf rpc: ListNodes(awyes.ListNodesRequest) returns (awyes.ListNodesResponse);
+     * @generated from protobuf rpc: RegisterHandler(awyes.RegisterHandlerRequest) returns (awyes.RegisterHandlerResponse);
      */
-    listNodes(input: ListNodesRequest, options?: RpcOptions): UnaryCall<ListNodesRequest, ListNodesResponse>;
+    registerHandler(input: RegisterHandlerRequest, options?: RpcOptions): UnaryCall<RegisterHandlerRequest, RegisterHandlerResponse>;
     /**
-     * @generated from protobuf rpc: ListFlows(awyes.ListFlowsRequest) returns (awyes.ListFlowsResponse);
+     * @generated from protobuf rpc: ListHandlers(awyes.ListHandlersRequest) returns (awyes.ListHandlersResponse);
      */
-    listFlows(input: ListFlowsRequest, options?: RpcOptions): UnaryCall<ListFlowsRequest, ListFlowsResponse>;
+    listHandlers(input: ListHandlersRequest, options?: RpcOptions): UnaryCall<ListHandlersRequest, ListHandlersResponse>;
     /**
-     * @generated from protobuf rpc: RegisterFlow(awyes.RegisterFlowRequest) returns (awyes.RegisterFlowResponse);
+     * @generated from protobuf rpc: RegisterRoute(awyes.RegisterRouteRequest) returns (awyes.RegisterRouteResponse);
      */
-    registerFlow(input: RegisterFlowRequest, options?: RpcOptions): UnaryCall<RegisterFlowRequest, RegisterFlowResponse>;
+    registerRoute(input: RegisterRouteRequest, options?: RpcOptions): UnaryCall<RegisterRouteRequest, RegisterRouteResponse>;
     /**
-     * @generated from protobuf rpc: ExecuteFlow(awyes.ExecuteFlowRequest) returns (awyes.ExecuteFlowResponse);
+     * @generated from protobuf rpc: ListRoutes(awyes.ListRoutesRequest) returns (awyes.ListRoutesResponse);
      */
-    executeFlow(input: ExecuteFlowRequest, options?: RpcOptions): UnaryCall<ExecuteFlowRequest, ExecuteFlowResponse>;
+    listRoutes(input: ListRoutesRequest, options?: RpcOptions): UnaryCall<ListRoutesRequest, ListRoutesResponse>;
     /**
-     * @generated from protobuf rpc: RegisterNode(awyes.RegisterNodeRequest) returns (awyes.RegisterNodeResponse);
+     * @generated from protobuf rpc: StartTrip(awyes.StartTripRequest) returns (awyes.StartTripResponse);
      */
-    registerNode(input: RegisterNodeRequest, options?: RpcOptions): UnaryCall<RegisterNodeRequest, RegisterNodeResponse>;
+    startTrip(input: StartTripRequest, options?: RpcOptions): UnaryCall<StartTripRequest, StartTripResponse>;
     /**
-     * @generated from protobuf rpc: RunAndWait(stream awyes.Event) returns (stream awyes.Event);
+     * @generated from protobuf rpc: WatchTrip(awyes.WatchTripRequest) returns (stream awyes.Event);
      */
-    runAndWait(options?: RpcOptions): DuplexStreamingCall<Event, Event>;
+    watchTrip(input: WatchTripRequest, options?: RpcOptions): ServerStreamingCall<WatchTripRequest, Event>;
+    /**
+     * @generated from protobuf rpc: ListTrips(awyes.ListTripsRequest) returns (awyes.ListTripsResponse);
+     */
+    listTrips(input: ListTripsRequest, options?: RpcOptions): UnaryCall<ListTripsRequest, ListTripsResponse>;
+    /**
+     * @generated from protobuf rpc: RunNodeAndWait(stream awyes.Event) returns (stream awyes.Event);
+     */
+    runNodeAndWait(options?: RpcOptions): DuplexStreamingCall<Event, Event>;
 }
 /**
  * Awyes definition
@@ -62,45 +74,59 @@ export class AwyesClient implements IAwyesClient, ServiceInfo {
     constructor(private readonly _transport: RpcTransport) {
     }
     /**
-     * @generated from protobuf rpc: ListNodes(awyes.ListNodesRequest) returns (awyes.ListNodesResponse);
+     * @generated from protobuf rpc: RegisterHandler(awyes.RegisterHandlerRequest) returns (awyes.RegisterHandlerResponse);
      */
-    listNodes(input: ListNodesRequest, options?: RpcOptions): UnaryCall<ListNodesRequest, ListNodesResponse> {
+    registerHandler(input: RegisterHandlerRequest, options?: RpcOptions): UnaryCall<RegisterHandlerRequest, RegisterHandlerResponse> {
         const method = this.methods[0], opt = this._transport.mergeOptions(options);
-        return stackIntercept<ListNodesRequest, ListNodesResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<RegisterHandlerRequest, RegisterHandlerResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: ListFlows(awyes.ListFlowsRequest) returns (awyes.ListFlowsResponse);
+     * @generated from protobuf rpc: ListHandlers(awyes.ListHandlersRequest) returns (awyes.ListHandlersResponse);
      */
-    listFlows(input: ListFlowsRequest, options?: RpcOptions): UnaryCall<ListFlowsRequest, ListFlowsResponse> {
+    listHandlers(input: ListHandlersRequest, options?: RpcOptions): UnaryCall<ListHandlersRequest, ListHandlersResponse> {
         const method = this.methods[1], opt = this._transport.mergeOptions(options);
-        return stackIntercept<ListFlowsRequest, ListFlowsResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<ListHandlersRequest, ListHandlersResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: RegisterFlow(awyes.RegisterFlowRequest) returns (awyes.RegisterFlowResponse);
+     * @generated from protobuf rpc: RegisterRoute(awyes.RegisterRouteRequest) returns (awyes.RegisterRouteResponse);
      */
-    registerFlow(input: RegisterFlowRequest, options?: RpcOptions): UnaryCall<RegisterFlowRequest, RegisterFlowResponse> {
+    registerRoute(input: RegisterRouteRequest, options?: RpcOptions): UnaryCall<RegisterRouteRequest, RegisterRouteResponse> {
         const method = this.methods[2], opt = this._transport.mergeOptions(options);
-        return stackIntercept<RegisterFlowRequest, RegisterFlowResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<RegisterRouteRequest, RegisterRouteResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: ExecuteFlow(awyes.ExecuteFlowRequest) returns (awyes.ExecuteFlowResponse);
+     * @generated from protobuf rpc: ListRoutes(awyes.ListRoutesRequest) returns (awyes.ListRoutesResponse);
      */
-    executeFlow(input: ExecuteFlowRequest, options?: RpcOptions): UnaryCall<ExecuteFlowRequest, ExecuteFlowResponse> {
+    listRoutes(input: ListRoutesRequest, options?: RpcOptions): UnaryCall<ListRoutesRequest, ListRoutesResponse> {
         const method = this.methods[3], opt = this._transport.mergeOptions(options);
-        return stackIntercept<ExecuteFlowRequest, ExecuteFlowResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<ListRoutesRequest, ListRoutesResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: RegisterNode(awyes.RegisterNodeRequest) returns (awyes.RegisterNodeResponse);
+     * @generated from protobuf rpc: StartTrip(awyes.StartTripRequest) returns (awyes.StartTripResponse);
      */
-    registerNode(input: RegisterNodeRequest, options?: RpcOptions): UnaryCall<RegisterNodeRequest, RegisterNodeResponse> {
+    startTrip(input: StartTripRequest, options?: RpcOptions): UnaryCall<StartTripRequest, StartTripResponse> {
         const method = this.methods[4], opt = this._transport.mergeOptions(options);
-        return stackIntercept<RegisterNodeRequest, RegisterNodeResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<StartTripRequest, StartTripResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: RunAndWait(stream awyes.Event) returns (stream awyes.Event);
+     * @generated from protobuf rpc: WatchTrip(awyes.WatchTripRequest) returns (stream awyes.Event);
      */
-    runAndWait(options?: RpcOptions): DuplexStreamingCall<Event, Event> {
+    watchTrip(input: WatchTripRequest, options?: RpcOptions): ServerStreamingCall<WatchTripRequest, Event> {
         const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        return stackIntercept<WatchTripRequest, Event>("serverStreaming", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: ListTrips(awyes.ListTripsRequest) returns (awyes.ListTripsResponse);
+     */
+    listTrips(input: ListTripsRequest, options?: RpcOptions): UnaryCall<ListTripsRequest, ListTripsResponse> {
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        return stackIntercept<ListTripsRequest, ListTripsResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: RunNodeAndWait(stream awyes.Event) returns (stream awyes.Event);
+     */
+    runNodeAndWait(options?: RpcOptions): DuplexStreamingCall<Event, Event> {
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
         return stackIntercept<Event, Event>("duplex", this._transport, method, opt);
     }
 }

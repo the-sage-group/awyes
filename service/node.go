@@ -1,52 +1,57 @@
 package service
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/the-sage-group/awyes/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/peer"
 )
 
-// RegisterNode registers a new node type
-func (s *Service) RegisterNode(ctx context.Context, req *proto.RegisterNodeRequest) (*proto.RegisterNodeResponse, error) {
-	if req.Node == nil {
-		return nil, status.Error(codes.InvalidArgument, "node is required")
+// RunNodeAndWait handles bidirectional event streaming for a node
+func (s *Service) RunNodeAndWait(stream proto.Awyes_RunNodeAndWaitServer) error {
+	p, ok := peer.FromContext(stream.Context())
+	if !ok {
+		return fmt.Errorf("no peer info")
 	}
+	fmt.Printf("RunNodeAndWait: %v\n", p)
 
-	if req.Node.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "node name is required")
+	// Create the channel for the node
+	if _, ok := s.nodeEvents.Load(p.Addr.String()); ok {
+		return fmt.Errorf("there is already a channel for this node")
 	}
+	nodeCh := make(chan *proto.Event)
+	s.nodeEvents.Store(p.Addr.String(), nodeCh)
 
-	// Check if node already exists
-	if _, exists := s.nodes.Load(req.Node.Name); exists {
-		return nil, status.Errorf(codes.AlreadyExists, "node %s already exists", req.Node.Name)
-	}
-
-	// Store the node
-	s.nodes.Store(req.Node.Name, req.Node)
-	fmt.Printf("Registered node: %s\n", req.Node.Name)
-
-	return &proto.RegisterNodeResponse{
-		Node: req.Node,
-	}, nil
-}
-
-// ListNodes lists all registered nodes
-func (s *Service) ListNodes(ctx context.Context, req *proto.ListNodesRequest) (*proto.ListNodesResponse, error) {
-	var nodes []*proto.Node
-
-	// Collect all nodes from the sync.Map
-	s.nodes.Range(func(key, value interface{}) bool {
-		if node, ok := value.(*proto.Node); ok {
-			nodes = append(nodes, node)
+	// Listen for events from both the stream and the node events channel
+	go func() {
+		for {
+			select {
+			case <-stream.Context().Done():
+				fmt.Printf("RunAndWait: context done\n")
+				return
+			case event := <-nodeCh:
+				if event.Status != proto.Status_EXECUTING.Enum() {
+					fmt.Printf("RunAndWait: event not executing: %v\n", event)
+					continue
+				}
+				if err := stream.Send(event); err != nil {
+					fmt.Printf("failed to send executing event: %v\n", err)
+					continue
+				}
+			}
 		}
-		return true
-	})
+	}()
 
-	fmt.Printf("Listed %d nodes\n", len(nodes))
-	return &proto.ListNodesResponse{
-		Nodes: nodes,
-	}, nil
+	// Handle incoming events from the stream, send them back to the trip
+	for {
+		event, err := stream.Recv()
+		if err != nil {
+			return fmt.Errorf("error receiving event: %v", err)
+		}
+		if respChan, ok := s.tripEvents.Load(event.Trip.Id); ok {
+			if tripCh, ok := respChan.(chan *proto.Event); ok {
+				tripCh <- event
+			}
+		}
+	}
 }
