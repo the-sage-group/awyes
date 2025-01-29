@@ -64,11 +64,11 @@ export interface Position {
     handler?: Handler;
 }
 /**
- * Edge definition
+ * Transition definition
  *
- * @generated from protobuf message awyes.Edge
+ * @generated from protobuf message awyes.Transition
  */
-export interface Edge {
+export interface Transition {
     /**
      * @generated from protobuf field: optional awyes.Position from = 1;
      */
@@ -113,9 +113,9 @@ export interface Route {
      */
     positions: Position[];
     /**
-     * @generated from protobuf field: repeated awyes.Edge edges = 7;
+     * @generated from protobuf field: repeated awyes.Transition transitions = 7;
      */
-    edges: Edge[];
+    transitions: Transition[];
     /**
      * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameters = 8;
      */
@@ -523,21 +523,21 @@ class Position$Type extends MessageType<Position> {
  */
 export const Position = new Position$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Edge$Type extends MessageType<Edge> {
+class Transition$Type extends MessageType<Transition> {
     constructor() {
-        super("awyes.Edge", [
+        super("awyes.Transition", [
             { no: 1, name: "from", kind: "message", T: () => Position },
             { no: 2, name: "to", kind: "message", T: () => Position },
             { no: 3, name: "label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
-    create(value?: PartialMessage<Edge>): Edge {
+    create(value?: PartialMessage<Transition>): Transition {
         const message = globalThis.Object.create((this.messagePrototype!));
         if (value !== undefined)
-            reflectionMergePartial<Edge>(this, message, value);
+            reflectionMergePartial<Transition>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Edge): Edge {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Transition): Transition {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -562,7 +562,7 @@ class Edge$Type extends MessageType<Edge> {
         }
         return message;
     }
-    internalBinaryWrite(message: Edge, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: Transition, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* optional awyes.Position from = 1; */
         if (message.from)
             Position.internalBinaryWrite(message.from, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
@@ -579,9 +579,9 @@ class Edge$Type extends MessageType<Edge> {
     }
 }
 /**
- * @generated MessageType for protobuf message awyes.Edge
+ * @generated MessageType for protobuf message awyes.Transition
  */
-export const Edge = new Edge$Type();
+export const Transition = new Transition$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Route$Type extends MessageType<Route> {
     constructor() {
@@ -592,14 +592,14 @@ class Route$Type extends MessageType<Route> {
             { no: 4, name: "version", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 6, name: "positions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Position },
-            { no: 7, name: "edges", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Edge },
+            { no: 7, name: "transitions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Transition },
             { no: 8, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
         ]);
     }
     create(value?: PartialMessage<Route>): Route {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.positions = [];
-        message.edges = [];
+        message.transitions = [];
         message.parameters = [];
         if (value !== undefined)
             reflectionMergePartial<Route>(this, message, value);
@@ -628,8 +628,8 @@ class Route$Type extends MessageType<Route> {
                 case /* repeated awyes.Position positions */ 6:
                     message.positions.push(Position.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated awyes.Edge edges */ 7:
-                    message.edges.push(Edge.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated awyes.Transition transitions */ 7:
+                    message.transitions.push(Transition.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* repeated google.protobuf.FieldDescriptorProto parameters */ 8:
                     message.parameters.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
@@ -664,9 +664,9 @@ class Route$Type extends MessageType<Route> {
         /* repeated awyes.Position positions = 6; */
         for (let i = 0; i < message.positions.length; i++)
             Position.internalBinaryWrite(message.positions[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* repeated awyes.Edge edges = 7; */
-        for (let i = 0; i < message.edges.length; i++)
-            Edge.internalBinaryWrite(message.edges[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* repeated awyes.Transition transitions = 7; */
+        for (let i = 0; i < message.transitions.length; i++)
+            Transition.internalBinaryWrite(message.transitions[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         /* repeated google.protobuf.FieldDescriptorProto parameters = 8; */
         for (let i = 0; i < message.parameters.length; i++)
             FieldDescriptorProto.internalBinaryWrite(message.parameters[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();

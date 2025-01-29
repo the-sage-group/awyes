@@ -8,11 +8,16 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/the-sage-group/awyes/db"
 	"github.com/the-sage-group/awyes/proto"
 	"github.com/the-sage-group/awyes/service"
 )
 
 func main() {
+	// Connect to database
+	pgdb := db.Connect()
+	defer pgdb.Close()
+
 	port := 50051
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
@@ -20,7 +25,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	proto.RegisterAwyesServer(s, service.New())
+	proto.RegisterAwyesServer(s, service.New(pgdb))
 	reflection.Register(s)
 
 	log.Printf("server listening at %v", lis.Addr())

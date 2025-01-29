@@ -88,9 +88,9 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 						trip.State[k] = v
 					}
 					// Really inefficently find the next position
-					for _, edge := range req.Route.GetEdges() {
-						if edge.GetFrom().GetName() == position.GetName() && edge.GetLabel() == event.GetLabel() {
-							queue = append(queue, edge.GetTo())
+					for _, transition := range req.Route.GetTransitions() {
+						if transition.GetFrom().GetName() == position.GetName() && transition.GetLabel() == event.GetLabel() {
+							queue = append(queue, transition.GetTo())
 						}
 					}
 				}

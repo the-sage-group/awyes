@@ -24,8 +24,8 @@ message Position {
   optional Handler handler = 3;
 }
 
-// Edge definition
-message Edge {
+// Transition definition
+message Transition {
   optional Position from = 1;
   optional Position to = 2;
   optional string label = 3;
@@ -39,7 +39,7 @@ message Route {
   optional int32 version = 4;
   optional string description = 5;
   repeated Position positions = 6;
-  repeated Edge edges = 7;
+  repeated Transition transitions = 7;
   repeated google.protobuf.FieldDescriptorProto parameters = 8;
 }
 
