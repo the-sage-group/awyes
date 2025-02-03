@@ -62,6 +62,7 @@ message Entity {
 
 enum EntityType {
   REPOSITORY = 0;
+  USER = 1;
 }
 
 // Event message for streaming execution updates

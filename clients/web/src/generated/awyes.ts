@@ -408,7 +408,11 @@ export enum EntityType {
     /**
      * @generated from protobuf enum value: REPOSITORY = 0;
      */
-    REPOSITORY = 0
+    REPOSITORY = 0,
+    /**
+     * @generated from protobuf enum value: USER = 1;
+     */
+    USER = 1
 }
 /**
  * Status for events and trips

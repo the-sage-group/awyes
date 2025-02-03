@@ -74,10 +74,13 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 	tripID := uuid.New().String()
 
 	// Create initial journey state
+	startedAt := time.Now().UnixMilli()
 	trip := &proto.Trip{
-		Id:    &tripID,
-		Route: req.Route,
-		State: make(map[string]*structpb.Value),
+		Id:        &tripID,
+		Route:     req.Route,
+		State:     make(map[string]*structpb.Value),
+		Entity:    req.GetEntity(),
+		StartedAt: &startedAt,
 	}
 
 	// Store initial trip in database
@@ -195,7 +198,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 			}
 		}
 
-		// Update the trip with a completion timestamp
+		// Update the trip with a completion timestamp and executed status
 		if _, err := s.db.Model(trip).Set("completed_at = ?", time.Now().UnixMilli()).Where("id = ?", tripID).Update(); err != nil {
 			fmt.Printf("failed to update trip with completion timestamp: %v\n", err)
 			return
