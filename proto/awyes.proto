@@ -66,14 +66,15 @@ enum EntityType {
 
 // Event message for streaming execution updates
 message Event {
-  optional Status status = 1;
-  optional Entity entity = 2;
-  optional Trip trip = 3;
-  optional Position position = 4;
-  optional string label = 5;
-  optional string message = 6;
-  optional int64 timestamp = 7;
-  map<string, google.protobuf.Value> state = 8;
+  optional string id = 1;
+  optional Status status = 2;
+  optional Entity entity = 3;
+  optional Trip trip = 4;
+  optional Position position = 5;
+  optional string label = 6;
+  optional string message = 7;
+  optional int64 timestamp = 8;
+  map<string, google.protobuf.Value> state = 9;
 }
 
 // Status for events and trips
@@ -89,47 +90,64 @@ enum Label {
   FAILURE = 1;
 }
 
-// Request to register a new handler
-message RegisterHandlerRequest { Handler handler = 1; }
-message RegisterHandlerResponse { Handler handler = 1; }
+// Event methods
+message ListEventsRequest { optional string trip_id = 1; }
+message ListEventsResponse { repeated Event events = 1; }
 
-// Request to list handlers
+// Handlers methods
+message RegisterHandlerRequest { optional Handler handler = 1; }
+message RegisterHandlerResponse { optional Handler handler = 1; }
 message ListHandlersRequest {}
 message ListHandlersResponse { repeated Handler handlers = 1; }
 
-// Request to register a new route
-message RegisterRouteRequest { Route route = 1; }
-message RegisterRouteResponse { Route route = 1; }
-
-// Request to list routes
+// Routes methods
+message RegisterRouteRequest { optional Route route = 1; }
+message RegisterRouteResponse { optional Route route = 1; }
 message ListRoutesRequest {}
 message ListRoutesResponse { repeated Route routes = 1; }
 
-// Request to start a trip for a route
+// Trips methods
 message StartTripRequest {
-  Route route = 1;
-  Entity entity = 2;
-  Position start = 3;
+  optional Route route = 1;
+  optional Entity entity = 2;
+  optional Position start = 3;
   map<string, google.protobuf.Value> state = 4;
 }
-message StartTripResponse { Trip trip = 1; }
-
-// Request to watch a trip
-message WatchTripRequest { string trip_id = 1; }
-
-// Request to list trips
-message ListTripsRequest { Entity entity = 1; }
+message StartTripResponse { optional Trip trip = 1; }
+message WatchTripRequest { optional string trip_id = 1; }
+message ListTripsRequest { optional Entity entity = 1; }
 message ListTripsResponse { repeated Trip trips = 1; }
+
+// Position methods
+message RegisterPositionRequest { optional Position position = 1; }
+message RegisterPositionResponse { optional Position position = 1; }
+message ListPositionsRequest {}
+message ListPositionsResponse { repeated Position positions = 1; }
 
 // Awyes definition
 service Awyes {
+  // Handlers methods
   rpc RegisterHandler(RegisterHandlerRequest)
       returns (RegisterHandlerResponse) {}
   rpc ListHandlers(ListHandlersRequest) returns (ListHandlersResponse) {}
+
+  // Routes methods
   rpc RegisterRoute(RegisterRouteRequest) returns (RegisterRouteResponse) {}
   rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {}
+
+  // Trips methods
   rpc StartTrip(StartTripRequest) returns (StartTripResponse) {}
   rpc WatchTrip(WatchTripRequest) returns (stream Event) {}
   rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
+
+  // Position methods
+  rpc RegisterPosition(RegisterPositionRequest)
+      returns (RegisterPositionResponse) {}
+  rpc ListPositions(ListPositionsRequest) returns (ListPositionsResponse) {}
+
+  // Events methods
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {}
+
+  // Node methods
   rpc RunNodeAndWait(stream Event) returns (stream Event) {}
 }

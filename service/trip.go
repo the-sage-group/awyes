@@ -10,6 +10,15 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+// ListTrips lists all trips
+func (s *Service) ListTrips(ctx context.Context, req *proto.ListTripsRequest) (*proto.ListTripsResponse, error) {
+	var trips []*proto.Trip
+	if err := s.db.Model(&trips).Select(); err != nil {
+		return nil, fmt.Errorf("failed to list trips: %v", err)
+	}
+	return &proto.ListTripsResponse{Trips: trips}, nil
+}
+
 // WatchTrip streams back node results
 func (s *Service) WatchTrip(req *proto.WatchTripRequest, stream proto.Awyes_WatchTripServer) error {
 	tripID := req.GetTripId()
@@ -56,9 +65,6 @@ func (s *Service) WatchTrip(req *proto.WatchTripRequest, stream proto.Awyes_Watc
 		if trip.GetCompletedAt() > 0 {
 			return nil
 		}
-
-		// Wait a bit before checking for new events
-		time.Sleep(time.Second * 5)
 	}
 }
 
@@ -145,7 +151,9 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 
 			// Push an event for this handler to the node channel
 			ts := time.Now().UnixMilli()
+			eventID := uuid.New().String()
 			nodeChannel <- &proto.Event{
+				Id:        &eventID,
 				Status:    proto.Status_EXECUTING.Enum(),
 				Entity:    req.Entity,
 				Position:  position,
