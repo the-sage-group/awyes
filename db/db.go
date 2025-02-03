@@ -21,7 +21,7 @@ func Connect() *pg.DB {
 	})
 
 	// Create the db tables
-	for _, model := range []interface{}{(*proto.Route)(nil), (*proto.Handler)(nil)} {
+	for _, model := range []interface{}{(*proto.Route)(nil), (*proto.Handler)(nil), (*proto.Event)(nil), (*proto.Trip)(nil)} {
 		err := db.Model(model).CreateTable(&orm.CreateTableOptions{
 			IfNotExists:   true,
 			FKConstraints: true,
@@ -53,6 +53,16 @@ func Connect() *pg.DB {
 		        ALTER TABLE routes 
 		        ADD CONSTRAINT routes_context_name_key 
 		        UNIQUE (context, name);
+		    END IF;
+
+		    -- Add unique constraint for trips if it doesn't exist
+		    IF NOT EXISTS (
+		        SELECT 1 FROM pg_constraint 
+		        WHERE conname = 'trips_id_key'
+		    ) THEN
+		        ALTER TABLE trips 
+		        ADD CONSTRAINT trips_id_key 
+		        UNIQUE (id);
 		    END IF;
 		END $$;`); err != nil {
 		log.Fatalf("failed to add unique constraints: %v", err)

@@ -27,10 +27,18 @@ func (s *Service) RunNodeAndWait(stream proto.Awyes_RunNodeAndWaitServer) error 
 		for {
 			select {
 			case <-stream.Context().Done():
-				fmt.Printf("RunAndWait: context done\n")
+				// The stream has been closed, so we need to stop the node
+				nodeCh, ok := s.nodeEvents.Load(p.Addr.String())
+				if !ok {
+					fmt.Printf("RunAndWait: no node channel found\n")
+					return
+				}
+				close(nodeCh.(chan *proto.Event))
+				s.nodeEvents.Delete(p.Addr.String())
+				fmt.Printf("RunAndWait: context done and node channel closed\n")
 				return
 			case event := <-nodeCh:
-				if event.Status != proto.Status_EXECUTING.Enum() {
+				if event.Status.String() != proto.Status_EXECUTING.String() {
 					fmt.Printf("RunAndWait: event not executing: %v\n", event)
 					continue
 				}
@@ -48,10 +56,17 @@ func (s *Service) RunNodeAndWait(stream proto.Awyes_RunNodeAndWaitServer) error 
 		if err != nil {
 			return fmt.Errorf("error receiving event: %v", err)
 		}
-		if respChan, ok := s.tripEvents.Load(event.Trip.Id); ok {
-			if tripCh, ok := respChan.(chan *proto.Event); ok {
-				tripCh <- event
-			}
+
+		respChan, ok := s.tripEvents.Load(event.Trip.GetId())
+		if !ok {
+			fmt.Printf("RunNodeAndWait: no trip channel found for trip %s\n", event.Trip.GetId())
+			continue
 		}
+		tripCh, ok := respChan.(chan *proto.Event)
+		if !ok {
+			fmt.Printf("RunNodeAndWait: trip channel is not a channel for trip %s\n", event.Trip.GetId())
+			continue
+		}
+		tripCh <- event
 	}
 }

@@ -192,9 +192,9 @@ export interface Event {
      */
     trip?: Trip;
     /**
-     * @generated from protobuf field: optional awyes.Handler handler = 4;
+     * @generated from protobuf field: optional awyes.Position position = 4;
      */
-    handler?: Handler;
+    position?: Position;
     /**
      * @generated from protobuf field: optional string label = 5;
      */
@@ -327,9 +327,9 @@ export interface StartTripResponse {
  */
 export interface WatchTripRequest {
     /**
-     * @generated from protobuf field: awyes.Trip trip = 1;
+     * @generated from protobuf field: string trip_id = 1;
      */
-    trip?: Trip;
+    tripId: string;
 }
 /**
  * Request to list trips
@@ -378,6 +378,21 @@ export enum Status {
      * @generated from protobuf enum value: ERROR = 2;
      */
     ERROR = 2
+}
+/**
+ * Labels for events and transitions
+ *
+ * @generated from protobuf enum awyes.Label
+ */
+export enum Label {
+    /**
+     * @generated from protobuf enum value: SUCCESS = 0;
+     */
+    SUCCESS = 0,
+    /**
+     * @generated from protobuf enum value: FAILURE = 1;
+     */
+    FAILURE = 1
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class Handler$Type extends MessageType<Handler> {
@@ -849,7 +864,7 @@ class Event$Type extends MessageType<Event> {
             { no: 1, name: "status", kind: "enum", opt: true, T: () => ["awyes.Status", Status] },
             { no: 2, name: "entity", kind: "message", T: () => Entity },
             { no: 3, name: "trip", kind: "message", T: () => Trip },
-            { no: 4, name: "handler", kind: "message", T: () => Handler },
+            { no: 4, name: "position", kind: "message", T: () => Position },
             { no: 5, name: "label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 6, name: "message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 7, name: "timestamp", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
@@ -877,8 +892,8 @@ class Event$Type extends MessageType<Event> {
                 case /* optional awyes.Trip trip */ 3:
                     message.trip = Trip.internalBinaryRead(reader, reader.uint32(), options, message.trip);
                     break;
-                case /* optional awyes.Handler handler */ 4:
-                    message.handler = Handler.internalBinaryRead(reader, reader.uint32(), options, message.handler);
+                case /* optional awyes.Position position */ 4:
+                    message.position = Position.internalBinaryRead(reader, reader.uint32(), options, message.position);
                     break;
                 case /* optional string label */ 5:
                     message.label = reader.string();
@@ -929,9 +944,9 @@ class Event$Type extends MessageType<Event> {
         /* optional awyes.Trip trip = 3; */
         if (message.trip)
             Trip.internalBinaryWrite(message.trip, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* optional awyes.Handler handler = 4; */
-        if (message.handler)
-            Handler.internalBinaryWrite(message.handler, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* optional awyes.Position position = 4; */
+        if (message.position)
+            Position.internalBinaryWrite(message.position, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         /* optional string label = 5; */
         if (message.label !== undefined)
             writer.tag(5, WireType.LengthDelimited).string(message.label);
@@ -1424,11 +1439,12 @@ export const StartTripResponse = new StartTripResponse$Type();
 class WatchTripRequest$Type extends MessageType<WatchTripRequest> {
     constructor() {
         super("awyes.WatchTripRequest", [
-            { no: 1, name: "trip", kind: "message", T: () => Trip }
+            { no: 1, name: "trip_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<WatchTripRequest>): WatchTripRequest {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.tripId = "";
         if (value !== undefined)
             reflectionMergePartial<WatchTripRequest>(this, message, value);
         return message;
@@ -1438,8 +1454,8 @@ class WatchTripRequest$Type extends MessageType<WatchTripRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* awyes.Trip trip */ 1:
-                    message.trip = Trip.internalBinaryRead(reader, reader.uint32(), options, message.trip);
+                case /* string trip_id */ 1:
+                    message.tripId = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1453,9 +1469,9 @@ class WatchTripRequest$Type extends MessageType<WatchTripRequest> {
         return message;
     }
     internalBinaryWrite(message: WatchTripRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* awyes.Trip trip = 1; */
-        if (message.trip)
-            Trip.internalBinaryWrite(message.trip, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string trip_id = 1; */
+        if (message.tripId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tripId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

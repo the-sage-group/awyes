@@ -69,7 +69,7 @@ message Event {
   optional Status status = 1;
   optional Entity entity = 2;
   optional Trip trip = 3;
-  optional Handler handler = 4;
+  optional Position position = 4;
   optional string label = 5;
   optional string message = 6;
   optional int64 timestamp = 7;
@@ -81,6 +81,12 @@ enum Status {
   EXECUTING = 0;
   COMPLETED = 1;
   ERROR = 2;
+}
+
+// Labels for events and transitions
+enum Label {
+  SUCCESS = 0;
+  FAILURE = 1;
 }
 
 // Request to register a new handler
@@ -109,7 +115,7 @@ message StartTripRequest {
 message StartTripResponse { Trip trip = 1; }
 
 // Request to watch a trip
-message WatchTripRequest { Trip trip = 1; }
+message WatchTripRequest { string trip_id = 1; }
 
 // Request to list trips
 message ListTripsRequest { Entity entity = 1; }
