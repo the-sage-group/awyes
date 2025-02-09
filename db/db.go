@@ -21,7 +21,7 @@ func Connect() *pg.DB {
 	})
 
 	// Create the db tables
-	for _, model := range []interface{}{(*proto.Route)(nil), (*proto.Handler)(nil), (*proto.Event)(nil), (*proto.Trip)(nil), (*proto.Position)(nil)} {
+	for _, model := range []interface{}{(*proto.Route)(nil), (*proto.Handler)(nil), (*proto.Event)(nil), (*proto.Trip)(nil), (*proto.Position)(nil), (*proto.Entity)(nil)} {
 		err := db.Model(model).CreateTable(&orm.CreateTableOptions{
 			IfNotExists:   true,
 			FKConstraints: true,
@@ -72,6 +72,16 @@ func Connect() *pg.DB {
 		    ) THEN
 		        ALTER TABLE positions 
 		        ADD CONSTRAINT positions_name_key 
+		        UNIQUE (name);
+		    END IF;
+
+		    -- Add unique constraint for entities if it doesn't exist
+		    IF NOT EXISTS (
+		        SELECT 1 FROM pg_constraint 
+		        WHERE conname = 'entities_name_key'
+		    ) THEN
+		        ALTER TABLE entities 
+		        ADD CONSTRAINT entities_name_key 
 		        UNIQUE (name);
 		    END IF;
 		END $$;`); err != nil {

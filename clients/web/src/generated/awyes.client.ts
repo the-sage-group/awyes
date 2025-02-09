@@ -5,12 +5,16 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Awyes } from "./awyes";
 import type { DuplexStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { SearchResponse } from "./awyes";
+import type { SearchRequest } from "./awyes";
 import type { ListEventsResponse } from "./awyes";
 import type { ListEventsRequest } from "./awyes";
 import type { ListPositionsResponse } from "./awyes";
 import type { ListPositionsRequest } from "./awyes";
 import type { RegisterPositionResponse } from "./awyes";
 import type { RegisterPositionRequest } from "./awyes";
+import type { GetTripResponse } from "./awyes";
+import type { GetTripRequest } from "./awyes";
 import type { ListTripsResponse } from "./awyes";
 import type { ListTripsRequest } from "./awyes";
 import type { Event } from "./awyes";
@@ -70,6 +74,10 @@ export interface IAwyesClient {
      */
     listTrips(input: ListTripsRequest, options?: RpcOptions): UnaryCall<ListTripsRequest, ListTripsResponse>;
     /**
+     * @generated from protobuf rpc: GetTrip(awyes.GetTripRequest) returns (awyes.GetTripResponse);
+     */
+    getTrip(input: GetTripRequest, options?: RpcOptions): UnaryCall<GetTripRequest, GetTripResponse>;
+    /**
      * Position methods
      *
      * @generated from protobuf rpc: RegisterPosition(awyes.RegisterPositionRequest) returns (awyes.RegisterPositionResponse);
@@ -85,6 +93,12 @@ export interface IAwyesClient {
      * @generated from protobuf rpc: ListEvents(awyes.ListEventsRequest) returns (awyes.ListEventsResponse);
      */
     listEvents(input: ListEventsRequest, options?: RpcOptions): UnaryCall<ListEventsRequest, ListEventsResponse>;
+    /**
+     * Search methods
+     *
+     * @generated from protobuf rpc: Search(awyes.SearchRequest) returns (awyes.SearchResponse);
+     */
+    search(input: SearchRequest, options?: RpcOptions): UnaryCall<SearchRequest, SearchResponse>;
     /**
      * Node methods
      *
@@ -159,19 +173,26 @@ export class AwyesClient implements IAwyesClient, ServiceInfo {
         return stackIntercept<ListTripsRequest, ListTripsResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: GetTrip(awyes.GetTripRequest) returns (awyes.GetTripResponse);
+     */
+    getTrip(input: GetTripRequest, options?: RpcOptions): UnaryCall<GetTripRequest, GetTripResponse> {
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetTripRequest, GetTripResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Position methods
      *
      * @generated from protobuf rpc: RegisterPosition(awyes.RegisterPositionRequest) returns (awyes.RegisterPositionResponse);
      */
     registerPosition(input: RegisterPositionRequest, options?: RpcOptions): UnaryCall<RegisterPositionRequest, RegisterPositionResponse> {
-        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        const method = this.methods[8], opt = this._transport.mergeOptions(options);
         return stackIntercept<RegisterPositionRequest, RegisterPositionResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: ListPositions(awyes.ListPositionsRequest) returns (awyes.ListPositionsResponse);
      */
     listPositions(input: ListPositionsRequest, options?: RpcOptions): UnaryCall<ListPositionsRequest, ListPositionsResponse> {
-        const method = this.methods[8], opt = this._transport.mergeOptions(options);
+        const method = this.methods[9], opt = this._transport.mergeOptions(options);
         return stackIntercept<ListPositionsRequest, ListPositionsResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -180,8 +201,17 @@ export class AwyesClient implements IAwyesClient, ServiceInfo {
      * @generated from protobuf rpc: ListEvents(awyes.ListEventsRequest) returns (awyes.ListEventsResponse);
      */
     listEvents(input: ListEventsRequest, options?: RpcOptions): UnaryCall<ListEventsRequest, ListEventsResponse> {
-        const method = this.methods[9], opt = this._transport.mergeOptions(options);
+        const method = this.methods[10], opt = this._transport.mergeOptions(options);
         return stackIntercept<ListEventsRequest, ListEventsResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * Search methods
+     *
+     * @generated from protobuf rpc: Search(awyes.SearchRequest) returns (awyes.SearchResponse);
+     */
+    search(input: SearchRequest, options?: RpcOptions): UnaryCall<SearchRequest, SearchResponse> {
+        const method = this.methods[11], opt = this._transport.mergeOptions(options);
+        return stackIntercept<SearchRequest, SearchResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * Node methods
@@ -189,7 +219,7 @@ export class AwyesClient implements IAwyesClient, ServiceInfo {
      * @generated from protobuf rpc: RunNodeAndWait(stream awyes.Event) returns (stream awyes.Event);
      */
     runNodeAndWait(options?: RpcOptions): DuplexStreamingCall<Event, Event> {
-        const method = this.methods[10], opt = this._transport.mergeOptions(options);
+        const method = this.methods[12], opt = this._transport.mergeOptions(options);
         return stackIntercept<Event, Event>("duplex", this._transport, method, opt);
     }
 }

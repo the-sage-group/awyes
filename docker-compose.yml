@@ -9,7 +9,8 @@ services:
     networks:
       - awyes-net
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -41,6 +42,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - awyes-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U awyes"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   awyes-net:

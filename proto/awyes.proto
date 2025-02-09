@@ -46,12 +46,11 @@ message Route {
 // Trip definition
 message Trip {
   optional string id = 1;
-  optional Status status = 2;
-  optional Entity entity = 3;
-  optional Route route = 4;
-  optional int64 started_at = 5;
-  optional int64 completed_at = 6;
-  map<string, google.protobuf.Value> state = 7;
+  optional Entity entity = 2;
+  optional Route route = 3;
+  optional int64 started_at = 4;
+  optional int64 completed_at = 5;
+  map<string, google.protobuf.Value> state = 6;
 }
 
 // Entity definition
@@ -118,12 +117,22 @@ message StartTripResponse { optional Trip trip = 1; }
 message WatchTripRequest { optional string trip_id = 1; }
 message ListTripsRequest { optional Entity entity = 1; }
 message ListTripsResponse { repeated Trip trips = 1; }
+message GetTripRequest { optional string trip_id = 1; }
+message GetTripResponse { optional Trip trip = 1; }
 
 // Position methods
 message RegisterPositionRequest { optional Position position = 1; }
 message RegisterPositionResponse { optional Position position = 1; }
 message ListPositionsRequest {}
 message ListPositionsResponse { repeated Position positions = 1; }
+
+// Search methods
+message SearchRequest { optional string query = 1; }
+message SearchResponse {
+  repeated Route routes = 1;
+  repeated Entity entities = 2;
+  repeated Handler handlers = 3;
+}
 
 // Awyes definition
 service Awyes {
@@ -140,6 +149,7 @@ service Awyes {
   rpc StartTrip(StartTripRequest) returns (StartTripResponse) {}
   rpc WatchTrip(WatchTripRequest) returns (stream Event) {}
   rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse) {}
 
   // Position methods
   rpc RegisterPosition(RegisterPositionRequest)
@@ -148,6 +158,9 @@ service Awyes {
 
   // Events methods
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {}
+
+  // Search methods
+  rpc Search(SearchRequest) returns (SearchResponse) {}
 
   // Node methods
   rpc RunNodeAndWait(stream Event) returns (stream Event) {}

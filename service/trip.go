@@ -13,7 +13,11 @@ import (
 // ListTrips lists all trips
 func (s *Service) ListTrips(ctx context.Context, req *proto.ListTripsRequest) (*proto.ListTripsResponse, error) {
 	var trips []*proto.Trip
-	if err := s.db.Model(&trips).Select(); err != nil {
+	query := s.db.Model(&trips)
+	if entity := req.GetEntity(); entity != nil {
+		query = query.Where("entity->>'name' = ? AND entity->>'type' = ?", entity.GetName(), fmt.Sprintf("%d", entity.GetType()))
+	}
+	if err := query.Select(); err != nil {
 		return nil, fmt.Errorf("failed to list trips: %v", err)
 	}
 	return &proto.ListTripsResponse{Trips: trips}, nil
@@ -30,42 +34,65 @@ func (s *Service) WatchTrip(req *proto.WatchTripRequest, stream proto.Awyes_Watc
 		return fmt.Errorf("failed to find trip: %v", err)
 	}
 
-	// Keep track of the last event timestamp we've seen
-	var lastTimestamp int64 = 0
+	// Create done channel for cleanup
+	done := make(chan struct{})
+	defer close(done)
 
-	for {
-		// Get all events for this trip newer than our last seen timestamp
-		var events []*proto.Event
-		if err := s.db.Model(&events).
-			Where("trip->>'id' = ? AND timestamp > ?", tripID, lastTimestamp).
-			Order("timestamp ASC").
-			Select(); err != nil {
-			fmt.Printf("failed to get events: %v\n", err)
-			return fmt.Errorf("failed to get events: %v", err)
-		}
-		fmt.Printf("got %d events\n", len(events))
+	// Create error channel for goroutine error handling
+	errChan := make(chan error, 1)
 
-		// Stream any new events
-		for _, event := range events {
-			if err := stream.Send(event); err != nil {
-				return fmt.Errorf("failed to stream event: %v", err)
+	// Start event polling in a goroutine
+	go func() {
+		var lastTimestamp int64 = 0
+		ticker := time.NewTicker(100 * time.Millisecond)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-done:
+				return
+			case <-ticker.C:
+				// Get all events for this trip newer than our last seen timestamp
+				var events []*proto.Event
+				if err := s.db.Model(&events).
+					Where("trip->>'id' = ? AND timestamp > ?", tripID, lastTimestamp).
+					Order("timestamp ASC").
+					Select(); err != nil {
+					errChan <- fmt.Errorf("failed to get events: %v", err)
+					return
+				}
+
+				// Stream any new events
+				for _, event := range events {
+					if err := stream.Send(event); err != nil {
+						errChan <- fmt.Errorf("failed to stream event: %v", err)
+						return
+					}
+					// Update our last seen timestamp
+					if event.GetTimestamp() > lastTimestamp {
+						lastTimestamp = event.GetTimestamp()
+					}
+				}
+
+				// Check if the trip is complete by getting its latest state
+				if err := s.db.Model(trip).Where("id = ?", tripID).Select(); err != nil {
+					errChan <- fmt.Errorf("failed to get trip state: %v", err)
+					return
+				}
+				// If we have a completion timestamp, and we've streamed all events, we're done
+				if trip.GetCompletedAt() > 0 {
+					errChan <- nil
+					return
+				}
 			}
-			// Update our last seen timestamp
-			if event.GetTimestamp() > lastTimestamp {
-				lastTimestamp = event.GetTimestamp()
-			}
 		}
+	}()
 
-		// Check if the trip is complete by getting its latest state
-		if err := s.db.Model(trip).Where("id = ?", tripID).Select(); err != nil {
-			fmt.Printf("failed to get trip state: %v\n", err)
-			return fmt.Errorf("failed to get trip state: %v", err)
-		}
-		// If we have a completion timestamp, and we've streamed all events, we're done
-		if trip.GetCompletedAt() > 0 {
-			return nil
-		}
+	// Wait for either an error or completion
+	if err := <-errChan; err != nil {
+		return err
 	}
+	return nil
 }
 
 // StartTrip executes a route and streams back node results
@@ -86,6 +113,11 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 	// Store initial trip in database
 	if _, err := s.db.Model(trip).Insert(); err != nil {
 		return nil, fmt.Errorf("failed to store initial trip in database: %v", err)
+	}
+
+	// Store the entity in the database, if it doesn't exist
+	if _, err := s.db.Model(req.GetEntity()).OnConflict("DO NOTHING").Insert(); err != nil {
+		return nil, fmt.Errorf("failed to store entity in database: %v", err)
 	}
 
 	// Grab the starting position from the route
@@ -135,6 +167,25 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 			// Find a node channel capable of executing this handler
 			nodes, ok := s.nodes.Load(hID)
 			if !ok {
+				// Create and store an error event signaling that the handler is not found
+				eventID := uuid.New().String()
+				ts := time.Now().UnixMilli()
+				message := fmt.Sprintf("no nodes found for handler %s", hID)
+				label := proto.Label_FAILURE.String()
+				event := &proto.Event{
+					Id:        &eventID,
+					Trip:      trip,
+					Status:    proto.Status_ERROR.Enum(),
+					Entity:    req.Entity,
+					Position:  position,
+					Label:     &label,
+					Timestamp: &ts,
+					Message:   &message,
+				}
+				if _, err := s.db.Model(event).Insert(); err != nil {
+					fmt.Printf("failed to store event in database: %v\n", err)
+					return
+				}
 				fmt.Printf("no nodes found for handler %s\n", hID)
 				return
 			}
@@ -148,10 +199,28 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 				break
 			}
 			if nodeChannel == nil {
+				// Create and store an error event signaling that the node channel is not found
+				eventID := uuid.New().String()
+				ts := time.Now().UnixMilli()
+				message := fmt.Sprintf("no node channel found for handler %s", hID)
+				label := proto.Label_FAILURE.String()
+				event := &proto.Event{
+					Id:        &eventID,
+					Trip:      trip,
+					Status:    proto.Status_ERROR.Enum(),
+					Entity:    req.Entity,
+					Position:  position,
+					Label:     &label,
+					Timestamp: &ts,
+					Message:   &message,
+				}
+				if _, err := s.db.Model(event).Insert(); err != nil {
+					fmt.Printf("failed to store event in database: %v\n", err)
+					return
+				}
 				fmt.Printf("no node channel found for handler %s\n", hID)
 				return
 			}
-
 			// Push an event for this handler to the node channel
 			ts := time.Now().UnixMilli()
 			eventID := uuid.New().String()
@@ -170,12 +239,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 				fmt.Printf("no trip channel found for trip %s\n", tripID)
 				return
 			}
-
 			event := <-tripEvents.(chan *proto.Event)
-			if event.Status.String() == proto.Status_ERROR.String() {
-				fmt.Printf("trip %s failed: %s\n", tripID, *event.Message)
-				return
-			}
 
 			// Store the event in the database
 			if _, err := s.db.Model(event).Insert(); err != nil {
@@ -198,7 +262,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 			}
 		}
 
-		// Update the trip with a completion timestamp and executed status
+		// Update the trip with a completion timestamp
 		if _, err := s.db.Model(trip).Set("completed_at = ?", time.Now().UnixMilli()).Where("id = ?", tripID).Update(); err != nil {
 			fmt.Printf("failed to update trip with completion timestamp: %v\n", err)
 			return
@@ -207,4 +271,13 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 
 	// Send initial response with journey ID
 	return &proto.StartTripResponse{Trip: trip}, nil
+}
+
+// GetTrip retrieves a single trip by ID
+func (s *Service) GetTrip(ctx context.Context, req *proto.GetTripRequest) (*proto.GetTripResponse, error) {
+	trip := new(proto.Trip)
+	if err := s.db.Model(trip).Where("id = ?", req.GetTripId()).Select(); err != nil {
+		return nil, fmt.Errorf("failed to get trip: %v", err)
+	}
+	return &proto.GetTripResponse{Trip: trip}, nil
 }
