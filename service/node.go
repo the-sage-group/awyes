@@ -57,14 +57,14 @@ func (s *Service) RunNodeAndWait(stream proto.Awyes_RunNodeAndWaitServer) error 
 			return fmt.Errorf("error receiving event: %v", err)
 		}
 
-		respChan, ok := s.tripEvents.Load(event.Trip.GetId())
+		respChan, ok := s.tripEvents.Load(event.GetTrip())
 		if !ok {
-			fmt.Printf("RunNodeAndWait: no trip channel found for trip %s\n", event.Trip.GetId())
+			fmt.Printf("RunNodeAndWait: no trip channel found for trip %s\n", event.GetTrip())
 			continue
 		}
 		tripCh, ok := respChan.(chan *proto.Event)
 		if !ok {
-			fmt.Printf("RunNodeAndWait: trip channel is not a channel for trip %s\n", event.Trip.GetId())
+			fmt.Printf("RunNodeAndWait: trip channel is not a channel for trip %s\n", event.GetTrip())
 			continue
 		}
 		tripCh <- event

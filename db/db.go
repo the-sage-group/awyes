@@ -48,11 +48,11 @@ func Connect() *pg.DB {
 		    -- Add unique constraint for routes if it doesn't exist
 		    IF NOT EXISTS (
 		        SELECT 1 FROM pg_constraint 
-		        WHERE conname = 'routes_context_name_key'
+		        WHERE conname = 'routes_context_name_version_key'
 		    ) THEN
 		        ALTER TABLE routes 
-		        ADD CONSTRAINT routes_context_name_key 
-		        UNIQUE (context, name);
+		        ADD CONSTRAINT routes_context_name_version_key 
+		        UNIQUE (context, name, version);
 		    END IF;
 
 		    -- Add unique constraint for trips if it doesn't exist

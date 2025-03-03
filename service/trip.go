@@ -25,7 +25,7 @@ func (s *Service) ListTrips(ctx context.Context, req *proto.ListTripsRequest) (*
 
 // WatchTrip streams back node results
 func (s *Service) WatchTrip(req *proto.WatchTripRequest, stream proto.Awyes_WatchTripServer) error {
-	tripID := req.GetTripId()
+	tripID := req.GetTrip()
 
 	// First, check if the trip exists and get its current state
 	trip := new(proto.Trip)
@@ -97,17 +97,18 @@ func (s *Service) WatchTrip(req *proto.WatchTripRequest, stream proto.Awyes_Watc
 
 // StartTrip executes a route and streams back node results
 func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*proto.StartTripResponse, error) {
-	// Generate a unique ID for this execution
-	tripID := uuid.New().String()
-
 	// Create initial journey state
+	tripID := uuid.New().String()
 	startedAt := time.Now().UnixMilli()
+	routeName := req.Route.GetName()
+	routeVersion := req.Route.GetVersion()
 	trip := &proto.Trip{
-		Id:        &tripID,
-		Route:     req.Route,
-		State:     make(map[string]*structpb.Value),
-		Entity:    req.GetEntity(),
-		StartedAt: &startedAt,
+		Id:           &tripID,
+		Route:        &routeName,
+		RouteVersion: &routeVersion,
+		State:        make(map[string]*structpb.Value),
+		Entity:       req.GetEntity(),
+		StartedAt:    &startedAt,
 	}
 
 	// Store initial trip in database
@@ -120,23 +121,10 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 		return nil, fmt.Errorf("failed to store entity in database: %v", err)
 	}
 
-	// Grab the starting position from the route
-	inDegree := make(map[string]int)
+	// Create a map of positions by name
+	positions := make(map[string]*proto.Position)
 	for _, position := range req.Route.GetPositions() {
-		inDegree[position.GetName()] = 0
-	}
-	for _, transition := range req.Route.GetTransitions() {
-		inDegree[transition.GetTo().GetName()]++
-	}
-	candidates := []*proto.Position{}
-	for _, position := range req.Route.GetPositions() {
-		if inDegree[position.GetName()] == 0 {
-			candidates = append(candidates, position)
-		}
-	}
-	if len(candidates) != 1 {
-		fmt.Printf("multiple starting positions found: %v\n", candidates)
-		return nil, fmt.Errorf("multiple starting positions found: %v", candidates)
+		positions[position.GetName()] = position
 	}
 
 	// Start asynchronous execution of the trip
@@ -153,7 +141,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 		}()
 
 		// Grab the starting handler, and put it in the queue
-		queue := []*proto.Position{candidates[0]}
+		queue := []*proto.Position{req.GetStart()}
 
 		// Process positions in order
 		for len(queue) > 0 {
@@ -161,32 +149,30 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 			queue = queue[1:]
 
 			fmt.Printf("executing position %v\n", position)
-			handler := position.GetHandler()
-			hID := fmt.Sprintf("%s.%s", handler.GetContext(), handler.GetName())
 
 			// Find a node channel capable of executing this handler
-			nodes, ok := s.nodes.Load(hID)
+			nodes, ok := s.nodes.Load(position.GetHandler())
 			if !ok {
 				// Create and store an error event signaling that the handler is not found
 				eventID := uuid.New().String()
 				ts := time.Now().UnixMilli()
-				message := fmt.Sprintf("no nodes found for handler %s", hID)
+				message := fmt.Sprintf("no nodes found for handler %s", position.GetHandler())
 				label := proto.Label_FAILURE.String()
 				event := &proto.Event{
-					Id:        &eventID,
-					Trip:      trip,
-					Status:    proto.Status_ERROR.Enum(),
-					Entity:    req.Entity,
-					Position:  position,
-					Label:     &label,
-					Timestamp: &ts,
-					Message:   &message,
+					Id:          &eventID,
+					Trip:        &tripID,
+					Status:      proto.Status_ERROR.Enum(),
+					Entity:      req.Entity,
+					Position:    position,
+					ExitLabel:   &label,
+					Timestamp:   &ts,
+					ExitMessage: &message,
 				}
 				if _, err := s.db.Model(event).Insert(); err != nil {
 					fmt.Printf("failed to store event in database: %v\n", err)
 					return
 				}
-				fmt.Printf("no nodes found for handler %s\n", hID)
+				fmt.Printf("no nodes found for handler %s\n", position.GetHandler())
 				return
 			}
 			var nodeChannel chan *proto.Event
@@ -202,23 +188,23 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 				// Create and store an error event signaling that the node channel is not found
 				eventID := uuid.New().String()
 				ts := time.Now().UnixMilli()
-				message := fmt.Sprintf("no node channel found for handler %s", hID)
+				message := fmt.Sprintf("no node channel found for handler %s", position.GetHandler())
 				label := proto.Label_FAILURE.String()
 				event := &proto.Event{
-					Id:        &eventID,
-					Trip:      trip,
-					Status:    proto.Status_ERROR.Enum(),
-					Entity:    req.Entity,
-					Position:  position,
-					Label:     &label,
-					Timestamp: &ts,
-					Message:   &message,
+					Id:          &eventID,
+					Trip:        &tripID,
+					Status:      proto.Status_ERROR.Enum(),
+					Entity:      req.Entity,
+					Position:    position,
+					ExitLabel:   &label,
+					Timestamp:   &ts,
+					ExitMessage: &message,
 				}
 				if _, err := s.db.Model(event).Insert(); err != nil {
 					fmt.Printf("failed to store event in database: %v\n", err)
 					return
 				}
-				fmt.Printf("no node channel found for handler %s\n", hID)
+				fmt.Printf("no node channel found for handler %s\n", position.GetHandler())
 				return
 			}
 			// Push an event for this handler to the node channel
@@ -229,7 +215,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 				Status:    proto.Status_EXECUTING.Enum(),
 				Entity:    req.Entity,
 				Position:  position,
-				Trip:      trip,
+				Trip:      &tripID,
 				Timestamp: &ts,
 			}
 
@@ -254,10 +240,16 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 			for k, v := range event.State {
 				trip.State[k] = v
 			}
-			// Really inefficently find the next position
-			for _, transition := range req.Route.GetTransitions() {
-				if transition.GetFrom().GetName() == position.GetName() && transition.GetLabel() == event.GetLabel() {
-					queue = append(queue, transition.GetTo())
+
+			// Find the next position to execute
+			for _, transition := range position.GetTransitions() {
+				if transition.GetLabel() == event.GetExitLabel() {
+					nextPosition, ok := positions[transition.GetPosition()]
+					if !ok {
+						fmt.Printf("no position found for transition %s\n", transition.GetPosition())
+						continue
+					}
+					queue = append(queue, nextPosition)
 				}
 			}
 		}
@@ -276,7 +268,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 // GetTrip retrieves a single trip by ID
 func (s *Service) GetTrip(ctx context.Context, req *proto.GetTripRequest) (*proto.GetTripResponse, error) {
 	trip := new(proto.Trip)
-	if err := s.db.Model(trip).Where("id = ?", req.GetTripId()).Select(); err != nil {
+	if err := s.db.Model(trip).Where("id = ?", req.GetTrip()).Select(); err != nil {
 		return nil, fmt.Errorf("failed to get trip: %v", err)
 	}
 	return &proto.GetTripResponse{Trip: trip}, nil

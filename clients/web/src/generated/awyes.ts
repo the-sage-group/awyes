@@ -28,9 +28,9 @@ export interface Handler {
      */
     name?: string;
     /**
-     * @generated from protobuf field: optional int32 version = 3;
+     * @generated from protobuf field: optional int64 version = 3;
      */
-    version?: number;
+    version?: string;
     /**
      * @generated from protobuf field: optional string description = 4;
      */
@@ -59,9 +59,13 @@ export interface Position {
      */
     description?: string;
     /**
-     * @generated from protobuf field: optional awyes.Handler handler = 3;
+     * @generated from protobuf field: optional string handler = 3;
      */
-    handler?: Handler;
+    handler?: string;
+    /**
+     * @generated from protobuf field: repeated awyes.Transition transitions = 4;
+     */
+    transitions: Transition[];
 }
 /**
  * Transition definition
@@ -70,17 +74,13 @@ export interface Position {
  */
 export interface Transition {
     /**
-     * @generated from protobuf field: optional awyes.Position from = 1;
-     */
-    from?: Position;
-    /**
-     * @generated from protobuf field: optional awyes.Position to = 2;
-     */
-    to?: Position;
-    /**
-     * @generated from protobuf field: optional string label = 3;
+     * @generated from protobuf field: optional string label = 1;
      */
     label?: string;
+    /**
+     * @generated from protobuf field: optional string position = 2;
+     */
+    position?: string;
 }
 /**
  * Route definition
@@ -97,27 +97,19 @@ export interface Route {
      */
     name?: string;
     /**
-     * @generated from protobuf field: optional string display_name = 3;
+     * @generated from protobuf field: optional int64 version = 3;
      */
-    displayName?: string;
+    version?: string;
     /**
-     * @generated from protobuf field: optional int32 version = 4;
-     */
-    version?: number;
-    /**
-     * @generated from protobuf field: optional string description = 5;
+     * @generated from protobuf field: optional string description = 4;
      */
     description?: string;
     /**
-     * @generated from protobuf field: repeated awyes.Position positions = 6;
+     * @generated from protobuf field: repeated awyes.Position positions = 5;
      */
     positions: Position[];
     /**
-     * @generated from protobuf field: repeated awyes.Transition transitions = 7;
-     */
-    transitions: Transition[];
-    /**
-     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameters = 8;
+     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameters = 7;
      */
     parameters: FieldDescriptorProto[];
 }
@@ -136,19 +128,23 @@ export interface Trip {
      */
     entity?: Entity;
     /**
-     * @generated from protobuf field: optional awyes.Route route = 3;
+     * @generated from protobuf field: optional string route = 3;
      */
-    route?: Route;
+    route?: string;
     /**
-     * @generated from protobuf field: optional int64 started_at = 4;
+     * @generated from protobuf field: optional int64 route_version = 4;
+     */
+    routeVersion?: string;
+    /**
+     * @generated from protobuf field: optional int64 started_at = 5;
      */
     startedAt?: string;
     /**
-     * @generated from protobuf field: optional int64 completed_at = 5;
+     * @generated from protobuf field: optional int64 completed_at = 6;
      */
     completedAt?: string;
     /**
-     * @generated from protobuf field: map<string, google.protobuf.Value> state = 6;
+     * @generated from protobuf field: map<string, google.protobuf.Value> state = 7;
      */
     state: {
         [key: string]: Value;
@@ -180,33 +176,33 @@ export interface Event {
      */
     id?: string;
     /**
-     * @generated from protobuf field: optional awyes.Status status = 2;
+     * @generated from protobuf field: optional string trip = 2;
+     */
+    trip?: string;
+    /**
+     * @generated from protobuf field: optional int64 timestamp = 3;
+     */
+    timestamp?: string;
+    /**
+     * @generated from protobuf field: optional awyes.Status status = 4;
      */
     status?: Status;
     /**
-     * @generated from protobuf field: optional awyes.Entity entity = 3;
+     * @generated from protobuf field: optional awyes.Entity entity = 5;
      */
     entity?: Entity;
     /**
-     * @generated from protobuf field: optional awyes.Trip trip = 4;
-     */
-    trip?: Trip;
-    /**
-     * @generated from protobuf field: optional awyes.Position position = 5;
+     * @generated from protobuf field: optional awyes.Position position = 6;
      */
     position?: Position;
     /**
-     * @generated from protobuf field: optional string label = 6;
+     * @generated from protobuf field: optional string exit_label = 7;
      */
-    label?: string;
+    exitLabel?: string;
     /**
-     * @generated from protobuf field: optional string message = 7;
+     * @generated from protobuf field: optional string exit_message = 8;
      */
-    message?: string;
-    /**
-     * @generated from protobuf field: optional int64 timestamp = 8;
-     */
-    timestamp?: string;
+    exitMessage?: string;
     /**
      * @generated from protobuf field: map<string, google.protobuf.Value> state = 9;
      */
@@ -221,9 +217,9 @@ export interface Event {
  */
 export interface ListEventsRequest {
     /**
-     * @generated from protobuf field: optional string trip_id = 1;
+     * @generated from protobuf field: optional string trip = 1;
      */
-    tripId?: string;
+    trip?: string;
 }
 /**
  * @generated from protobuf message awyes.ListEventsResponse
@@ -269,24 +265,38 @@ export interface ListHandlersResponse {
     handlers: Handler[];
 }
 /**
+ * @generated from protobuf message awyes.GetHandlerRequest
+ */
+export interface GetHandlerRequest {
+    /**
+     * @generated from protobuf field: optional string handler = 1;
+     */
+    handler?: string;
+}
+/**
+ * @generated from protobuf message awyes.GetHandlerResponse
+ */
+export interface GetHandlerResponse {
+    /**
+     * @generated from protobuf field: optional awyes.Handler handler = 1;
+     */
+    handler?: Handler;
+}
+/**
  * Routes methods
  *
  * @generated from protobuf message awyes.RegisterRouteRequest
  */
 export interface RegisterRouteRequest {
     /**
-     * @generated from protobuf field: optional awyes.Route route = 1;
+     * @generated from protobuf field: optional string route = 1;
      */
-    route?: Route;
+    route?: string;
 }
 /**
  * @generated from protobuf message awyes.RegisterRouteResponse
  */
 export interface RegisterRouteResponse {
-    /**
-     * @generated from protobuf field: optional awyes.Route route = 1;
-     */
-    route?: Route;
 }
 /**
  * @generated from protobuf message awyes.ListRoutesRequest
@@ -301,6 +311,28 @@ export interface ListRoutesResponse {
      * @generated from protobuf field: repeated awyes.Route routes = 1;
      */
     routes: Route[];
+}
+/**
+ * @generated from protobuf message awyes.GetRouteRequest
+ */
+export interface GetRouteRequest {
+    /**
+     * @generated from protobuf field: optional string route = 1;
+     */
+    route?: string;
+    /**
+     * @generated from protobuf field: optional int64 version = 2;
+     */
+    version?: string;
+}
+/**
+ * @generated from protobuf message awyes.GetRouteResponse
+ */
+export interface GetRouteResponse {
+    /**
+     * @generated from protobuf field: optional awyes.Route route = 1;
+     */
+    route?: Route;
 }
 /**
  * Trips methods
@@ -341,9 +373,9 @@ export interface StartTripResponse {
  */
 export interface WatchTripRequest {
     /**
-     * @generated from protobuf field: optional string trip_id = 1;
+     * @generated from protobuf field: optional string trip = 1;
      */
-    tripId?: string;
+    trip?: string;
 }
 /**
  * @generated from protobuf message awyes.ListTripsRequest
@@ -368,9 +400,9 @@ export interface ListTripsResponse {
  */
 export interface GetTripRequest {
     /**
-     * @generated from protobuf field: optional string trip_id = 1;
+     * @generated from protobuf field: optional string trip = 1;
      */
-    tripId?: string;
+    trip?: string;
 }
 /**
  * @generated from protobuf message awyes.GetTripResponse
@@ -380,40 +412,6 @@ export interface GetTripResponse {
      * @generated from protobuf field: optional awyes.Trip trip = 1;
      */
     trip?: Trip;
-}
-/**
- * Position methods
- *
- * @generated from protobuf message awyes.RegisterPositionRequest
- */
-export interface RegisterPositionRequest {
-    /**
-     * @generated from protobuf field: optional awyes.Position position = 1;
-     */
-    position?: Position;
-}
-/**
- * @generated from protobuf message awyes.RegisterPositionResponse
- */
-export interface RegisterPositionResponse {
-    /**
-     * @generated from protobuf field: optional awyes.Position position = 1;
-     */
-    position?: Position;
-}
-/**
- * @generated from protobuf message awyes.ListPositionsRequest
- */
-export interface ListPositionsRequest {
-}
-/**
- * @generated from protobuf message awyes.ListPositionsResponse
- */
-export interface ListPositionsResponse {
-    /**
-     * @generated from protobuf field: repeated awyes.Position positions = 1;
-     */
-    positions: Position[];
 }
 /**
  * Search methods
@@ -496,7 +494,7 @@ class Handler$Type extends MessageType<Handler> {
         super("awyes.Handler", [
             { no: 1, name: "context", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "version", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "version", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
             { no: 4, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto },
             { no: 6, name: "returns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
@@ -521,8 +519,8 @@ class Handler$Type extends MessageType<Handler> {
                 case /* optional string name */ 2:
                     message.name = reader.string();
                     break;
-                case /* optional int32 version */ 3:
-                    message.version = reader.int32();
+                case /* optional int64 version */ 3:
+                    message.version = reader.int64().toString();
                     break;
                 case /* optional string description */ 4:
                     message.description = reader.string();
@@ -551,9 +549,9 @@ class Handler$Type extends MessageType<Handler> {
         /* optional string name = 2; */
         if (message.name !== undefined)
             writer.tag(2, WireType.LengthDelimited).string(message.name);
-        /* optional int32 version = 3; */
+        /* optional int64 version = 3; */
         if (message.version !== undefined)
-            writer.tag(3, WireType.Varint).int32(message.version);
+            writer.tag(3, WireType.Varint).int64(message.version);
         /* optional string description = 4; */
         if (message.description !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.description);
@@ -579,11 +577,13 @@ class Position$Type extends MessageType<Position> {
         super("awyes.Position", [
             { no: 1, name: "name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "handler", kind: "message", T: () => Handler }
+            { no: 3, name: "handler", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "transitions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Transition }
         ]);
     }
     create(value?: PartialMessage<Position>): Position {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.transitions = [];
         if (value !== undefined)
             reflectionMergePartial<Position>(this, message, value);
         return message;
@@ -599,8 +599,11 @@ class Position$Type extends MessageType<Position> {
                 case /* optional string description */ 2:
                     message.description = reader.string();
                     break;
-                case /* optional awyes.Handler handler */ 3:
-                    message.handler = Handler.internalBinaryRead(reader, reader.uint32(), options, message.handler);
+                case /* optional string handler */ 3:
+                    message.handler = reader.string();
+                    break;
+                case /* repeated awyes.Transition transitions */ 4:
+                    message.transitions.push(Transition.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -620,9 +623,12 @@ class Position$Type extends MessageType<Position> {
         /* optional string description = 2; */
         if (message.description !== undefined)
             writer.tag(2, WireType.LengthDelimited).string(message.description);
-        /* optional awyes.Handler handler = 3; */
-        if (message.handler)
-            Handler.internalBinaryWrite(message.handler, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* optional string handler = 3; */
+        if (message.handler !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.handler);
+        /* repeated awyes.Transition transitions = 4; */
+        for (let i = 0; i < message.transitions.length; i++)
+            Transition.internalBinaryWrite(message.transitions[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -637,9 +643,8 @@ export const Position = new Position$Type();
 class Transition$Type extends MessageType<Transition> {
     constructor() {
         super("awyes.Transition", [
-            { no: 1, name: "from", kind: "message", T: () => Position },
-            { no: 2, name: "to", kind: "message", T: () => Position },
-            { no: 3, name: "label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "position", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<Transition>): Transition {
@@ -653,14 +658,11 @@ class Transition$Type extends MessageType<Transition> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional awyes.Position from */ 1:
-                    message.from = Position.internalBinaryRead(reader, reader.uint32(), options, message.from);
-                    break;
-                case /* optional awyes.Position to */ 2:
-                    message.to = Position.internalBinaryRead(reader, reader.uint32(), options, message.to);
-                    break;
-                case /* optional string label */ 3:
+                case /* optional string label */ 1:
                     message.label = reader.string();
+                    break;
+                case /* optional string position */ 2:
+                    message.position = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -674,15 +676,12 @@ class Transition$Type extends MessageType<Transition> {
         return message;
     }
     internalBinaryWrite(message: Transition, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional awyes.Position from = 1; */
-        if (message.from)
-            Position.internalBinaryWrite(message.from, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* optional awyes.Position to = 2; */
-        if (message.to)
-            Position.internalBinaryWrite(message.to, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* optional string label = 3; */
+        /* optional string label = 1; */
         if (message.label !== undefined)
-            writer.tag(3, WireType.LengthDelimited).string(message.label);
+            writer.tag(1, WireType.LengthDelimited).string(message.label);
+        /* optional string position = 2; */
+        if (message.position !== undefined)
+            writer.tag(2, WireType.LengthDelimited).string(message.position);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -699,18 +698,15 @@ class Route$Type extends MessageType<Route> {
         super("awyes.Route", [
             { no: 1, name: "context", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "display_name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "version", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "positions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Position },
-            { no: 7, name: "transitions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Transition },
-            { no: 8, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
+            { no: 3, name: "version", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 4, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "positions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Position },
+            { no: 7, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
         ]);
     }
     create(value?: PartialMessage<Route>): Route {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.positions = [];
-        message.transitions = [];
         message.parameters = [];
         if (value !== undefined)
             reflectionMergePartial<Route>(this, message, value);
@@ -727,22 +723,16 @@ class Route$Type extends MessageType<Route> {
                 case /* optional string name */ 2:
                     message.name = reader.string();
                     break;
-                case /* optional string display_name */ 3:
-                    message.displayName = reader.string();
+                case /* optional int64 version */ 3:
+                    message.version = reader.int64().toString();
                     break;
-                case /* optional int32 version */ 4:
-                    message.version = reader.int32();
-                    break;
-                case /* optional string description */ 5:
+                case /* optional string description */ 4:
                     message.description = reader.string();
                     break;
-                case /* repeated awyes.Position positions */ 6:
+                case /* repeated awyes.Position positions */ 5:
                     message.positions.push(Position.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated awyes.Transition transitions */ 7:
-                    message.transitions.push(Transition.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                case /* repeated google.protobuf.FieldDescriptorProto parameters */ 8:
+                case /* repeated google.protobuf.FieldDescriptorProto parameters */ 7:
                     message.parameters.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -763,24 +753,18 @@ class Route$Type extends MessageType<Route> {
         /* optional string name = 2; */
         if (message.name !== undefined)
             writer.tag(2, WireType.LengthDelimited).string(message.name);
-        /* optional string display_name = 3; */
-        if (message.displayName !== undefined)
-            writer.tag(3, WireType.LengthDelimited).string(message.displayName);
-        /* optional int32 version = 4; */
+        /* optional int64 version = 3; */
         if (message.version !== undefined)
-            writer.tag(4, WireType.Varint).int32(message.version);
-        /* optional string description = 5; */
+            writer.tag(3, WireType.Varint).int64(message.version);
+        /* optional string description = 4; */
         if (message.description !== undefined)
-            writer.tag(5, WireType.LengthDelimited).string(message.description);
-        /* repeated awyes.Position positions = 6; */
+            writer.tag(4, WireType.LengthDelimited).string(message.description);
+        /* repeated awyes.Position positions = 5; */
         for (let i = 0; i < message.positions.length; i++)
-            Position.internalBinaryWrite(message.positions[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* repeated awyes.Transition transitions = 7; */
-        for (let i = 0; i < message.transitions.length; i++)
-            Transition.internalBinaryWrite(message.transitions[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
-        /* repeated google.protobuf.FieldDescriptorProto parameters = 8; */
+            Position.internalBinaryWrite(message.positions[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* repeated google.protobuf.FieldDescriptorProto parameters = 7; */
         for (let i = 0; i < message.parameters.length; i++)
-            FieldDescriptorProto.internalBinaryWrite(message.parameters[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();
+            FieldDescriptorProto.internalBinaryWrite(message.parameters[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -797,10 +781,11 @@ class Trip$Type extends MessageType<Trip> {
         super("awyes.Trip", [
             { no: 1, name: "id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "entity", kind: "message", T: () => Entity },
-            { no: 3, name: "route", kind: "message", T: () => Route },
-            { no: 4, name: "started_at", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 5, name: "completed_at", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 6, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
+            { no: 3, name: "route", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "route_version", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 5, name: "started_at", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 6, name: "completed_at", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 7, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
         ]);
     }
     create(value?: PartialMessage<Trip>): Trip {
@@ -821,17 +806,20 @@ class Trip$Type extends MessageType<Trip> {
                 case /* optional awyes.Entity entity */ 2:
                     message.entity = Entity.internalBinaryRead(reader, reader.uint32(), options, message.entity);
                     break;
-                case /* optional awyes.Route route */ 3:
-                    message.route = Route.internalBinaryRead(reader, reader.uint32(), options, message.route);
+                case /* optional string route */ 3:
+                    message.route = reader.string();
                     break;
-                case /* optional int64 started_at */ 4:
+                case /* optional int64 route_version */ 4:
+                    message.routeVersion = reader.int64().toString();
+                    break;
+                case /* optional int64 started_at */ 5:
                     message.startedAt = reader.int64().toString();
                     break;
-                case /* optional int64 completed_at */ 5:
+                case /* optional int64 completed_at */ 6:
                     message.completedAt = reader.int64().toString();
                     break;
-                case /* map<string, google.protobuf.Value> state */ 6:
-                    this.binaryReadMap6(message.state, reader, options);
+                case /* map<string, google.protobuf.Value> state */ 7:
+                    this.binaryReadMap7(message.state, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -844,7 +832,7 @@ class Trip$Type extends MessageType<Trip> {
         }
         return message;
     }
-    private binaryReadMap6(map: Trip["state"], reader: IBinaryReader, options: BinaryReadOptions): void {
+    private binaryReadMap7(map: Trip["state"], reader: IBinaryReader, options: BinaryReadOptions): void {
         let len = reader.uint32(), end = reader.pos + len, key: keyof Trip["state"] | undefined, val: Trip["state"][any] | undefined;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -867,18 +855,21 @@ class Trip$Type extends MessageType<Trip> {
         /* optional awyes.Entity entity = 2; */
         if (message.entity)
             Entity.internalBinaryWrite(message.entity, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* optional awyes.Route route = 3; */
-        if (message.route)
-            Route.internalBinaryWrite(message.route, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* optional int64 started_at = 4; */
+        /* optional string route = 3; */
+        if (message.route !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.route);
+        /* optional int64 route_version = 4; */
+        if (message.routeVersion !== undefined)
+            writer.tag(4, WireType.Varint).int64(message.routeVersion);
+        /* optional int64 started_at = 5; */
         if (message.startedAt !== undefined)
-            writer.tag(4, WireType.Varint).int64(message.startedAt);
-        /* optional int64 completed_at = 5; */
+            writer.tag(5, WireType.Varint).int64(message.startedAt);
+        /* optional int64 completed_at = 6; */
         if (message.completedAt !== undefined)
-            writer.tag(5, WireType.Varint).int64(message.completedAt);
-        /* map<string, google.protobuf.Value> state = 6; */
+            writer.tag(6, WireType.Varint).int64(message.completedAt);
+        /* map<string, google.protobuf.Value> state = 7; */
         for (let k of globalThis.Object.keys(message.state)) {
-            writer.tag(6, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(7, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
             writer.tag(2, WireType.LengthDelimited).fork();
             Value.internalBinaryWrite(message.state[k], writer, options);
             writer.join().join();
@@ -951,13 +942,13 @@ class Event$Type extends MessageType<Event> {
     constructor() {
         super("awyes.Event", [
             { no: 1, name: "id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "status", kind: "enum", opt: true, T: () => ["awyes.Status", Status] },
-            { no: 3, name: "entity", kind: "message", T: () => Entity },
-            { no: 4, name: "trip", kind: "message", T: () => Trip },
-            { no: 5, name: "position", kind: "message", T: () => Position },
-            { no: 6, name: "label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 7, name: "message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 8, name: "timestamp", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 2, name: "trip", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "timestamp", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 4, name: "status", kind: "enum", opt: true, T: () => ["awyes.Status", Status] },
+            { no: 5, name: "entity", kind: "message", T: () => Entity },
+            { no: 6, name: "position", kind: "message", T: () => Position },
+            { no: 7, name: "exit_label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 8, name: "exit_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 9, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
         ]);
     }
@@ -976,26 +967,26 @@ class Event$Type extends MessageType<Event> {
                 case /* optional string id */ 1:
                     message.id = reader.string();
                     break;
-                case /* optional awyes.Status status */ 2:
+                case /* optional string trip */ 2:
+                    message.trip = reader.string();
+                    break;
+                case /* optional int64 timestamp */ 3:
+                    message.timestamp = reader.int64().toString();
+                    break;
+                case /* optional awyes.Status status */ 4:
                     message.status = reader.int32();
                     break;
-                case /* optional awyes.Entity entity */ 3:
+                case /* optional awyes.Entity entity */ 5:
                     message.entity = Entity.internalBinaryRead(reader, reader.uint32(), options, message.entity);
                     break;
-                case /* optional awyes.Trip trip */ 4:
-                    message.trip = Trip.internalBinaryRead(reader, reader.uint32(), options, message.trip);
-                    break;
-                case /* optional awyes.Position position */ 5:
+                case /* optional awyes.Position position */ 6:
                     message.position = Position.internalBinaryRead(reader, reader.uint32(), options, message.position);
                     break;
-                case /* optional string label */ 6:
-                    message.label = reader.string();
+                case /* optional string exit_label */ 7:
+                    message.exitLabel = reader.string();
                     break;
-                case /* optional string message */ 7:
-                    message.message = reader.string();
-                    break;
-                case /* optional int64 timestamp */ 8:
-                    message.timestamp = reader.int64().toString();
+                case /* optional string exit_message */ 8:
+                    message.exitMessage = reader.string();
                     break;
                 case /* map<string, google.protobuf.Value> state */ 9:
                     this.binaryReadMap9(message.state, reader, options);
@@ -1031,27 +1022,27 @@ class Event$Type extends MessageType<Event> {
         /* optional string id = 1; */
         if (message.id !== undefined)
             writer.tag(1, WireType.LengthDelimited).string(message.id);
-        /* optional awyes.Status status = 2; */
-        if (message.status !== undefined)
-            writer.tag(2, WireType.Varint).int32(message.status);
-        /* optional awyes.Entity entity = 3; */
-        if (message.entity)
-            Entity.internalBinaryWrite(message.entity, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* optional awyes.Trip trip = 4; */
-        if (message.trip)
-            Trip.internalBinaryWrite(message.trip, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* optional awyes.Position position = 5; */
-        if (message.position)
-            Position.internalBinaryWrite(message.position, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* optional string label = 6; */
-        if (message.label !== undefined)
-            writer.tag(6, WireType.LengthDelimited).string(message.label);
-        /* optional string message = 7; */
-        if (message.message !== undefined)
-            writer.tag(7, WireType.LengthDelimited).string(message.message);
-        /* optional int64 timestamp = 8; */
+        /* optional string trip = 2; */
+        if (message.trip !== undefined)
+            writer.tag(2, WireType.LengthDelimited).string(message.trip);
+        /* optional int64 timestamp = 3; */
         if (message.timestamp !== undefined)
-            writer.tag(8, WireType.Varint).int64(message.timestamp);
+            writer.tag(3, WireType.Varint).int64(message.timestamp);
+        /* optional awyes.Status status = 4; */
+        if (message.status !== undefined)
+            writer.tag(4, WireType.Varint).int32(message.status);
+        /* optional awyes.Entity entity = 5; */
+        if (message.entity)
+            Entity.internalBinaryWrite(message.entity, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* optional awyes.Position position = 6; */
+        if (message.position)
+            Position.internalBinaryWrite(message.position, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* optional string exit_label = 7; */
+        if (message.exitLabel !== undefined)
+            writer.tag(7, WireType.LengthDelimited).string(message.exitLabel);
+        /* optional string exit_message = 8; */
+        if (message.exitMessage !== undefined)
+            writer.tag(8, WireType.LengthDelimited).string(message.exitMessage);
         /* map<string, google.protobuf.Value> state = 9; */
         for (let k of globalThis.Object.keys(message.state)) {
             writer.tag(9, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
@@ -1073,7 +1064,7 @@ export const Event = new Event$Type();
 class ListEventsRequest$Type extends MessageType<ListEventsRequest> {
     constructor() {
         super("awyes.ListEventsRequest", [
-            { no: 1, name: "trip_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "trip", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<ListEventsRequest>): ListEventsRequest {
@@ -1087,8 +1078,8 @@ class ListEventsRequest$Type extends MessageType<ListEventsRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional string trip_id */ 1:
-                    message.tripId = reader.string();
+                case /* optional string trip */ 1:
+                    message.trip = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1102,9 +1093,9 @@ class ListEventsRequest$Type extends MessageType<ListEventsRequest> {
         return message;
     }
     internalBinaryWrite(message: ListEventsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional string trip_id = 1; */
-        if (message.tripId !== undefined)
-            writer.tag(1, WireType.LengthDelimited).string(message.tripId);
+        /* optional string trip = 1; */
+        if (message.trip !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.trip);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1327,10 +1318,102 @@ class ListHandlersResponse$Type extends MessageType<ListHandlersResponse> {
  */
 export const ListHandlersResponse = new ListHandlersResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetHandlerRequest$Type extends MessageType<GetHandlerRequest> {
+    constructor() {
+        super("awyes.GetHandlerRequest", [
+            { no: 1, name: "handler", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GetHandlerRequest>): GetHandlerRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<GetHandlerRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetHandlerRequest): GetHandlerRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* optional string handler */ 1:
+                    message.handler = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetHandlerRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* optional string handler = 1; */
+        if (message.handler !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.handler);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message awyes.GetHandlerRequest
+ */
+export const GetHandlerRequest = new GetHandlerRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetHandlerResponse$Type extends MessageType<GetHandlerResponse> {
+    constructor() {
+        super("awyes.GetHandlerResponse", [
+            { no: 1, name: "handler", kind: "message", T: () => Handler }
+        ]);
+    }
+    create(value?: PartialMessage<GetHandlerResponse>): GetHandlerResponse {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<GetHandlerResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetHandlerResponse): GetHandlerResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* optional awyes.Handler handler */ 1:
+                    message.handler = Handler.internalBinaryRead(reader, reader.uint32(), options, message.handler);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetHandlerResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* optional awyes.Handler handler = 1; */
+        if (message.handler)
+            Handler.internalBinaryWrite(message.handler, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message awyes.GetHandlerResponse
+ */
+export const GetHandlerResponse = new GetHandlerResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class RegisterRouteRequest$Type extends MessageType<RegisterRouteRequest> {
     constructor() {
         super("awyes.RegisterRouteRequest", [
-            { no: 1, name: "route", kind: "message", T: () => Route }
+            { no: 1, name: "route", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<RegisterRouteRequest>): RegisterRouteRequest {
@@ -1344,8 +1427,8 @@ class RegisterRouteRequest$Type extends MessageType<RegisterRouteRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional awyes.Route route */ 1:
-                    message.route = Route.internalBinaryRead(reader, reader.uint32(), options, message.route);
+                case /* optional string route */ 1:
+                    message.route = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1359,9 +1442,9 @@ class RegisterRouteRequest$Type extends MessageType<RegisterRouteRequest> {
         return message;
     }
     internalBinaryWrite(message: RegisterRouteRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional awyes.Route route = 1; */
-        if (message.route)
-            Route.internalBinaryWrite(message.route, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* optional string route = 1; */
+        if (message.route !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.route);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1375,9 +1458,7 @@ export const RegisterRouteRequest = new RegisterRouteRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class RegisterRouteResponse$Type extends MessageType<RegisterRouteResponse> {
     constructor() {
-        super("awyes.RegisterRouteResponse", [
-            { no: 1, name: "route", kind: "message", T: () => Route }
-        ]);
+        super("awyes.RegisterRouteResponse", []);
     }
     create(value?: PartialMessage<RegisterRouteResponse>): RegisterRouteResponse {
         const message = globalThis.Object.create((this.messagePrototype!));
@@ -1386,28 +1467,9 @@ class RegisterRouteResponse$Type extends MessageType<RegisterRouteResponse> {
         return message;
     }
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RegisterRouteResponse): RegisterRouteResponse {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* optional awyes.Route route */ 1:
-                    message.route = Route.internalBinaryRead(reader, reader.uint32(), options, message.route);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
+        return target ?? this.create();
     }
     internalBinaryWrite(message: RegisterRouteResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional awyes.Route route = 1; */
-        if (message.route)
-            Route.internalBinaryWrite(message.route, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1490,6 +1552,105 @@ class ListRoutesResponse$Type extends MessageType<ListRoutesResponse> {
  * @generated MessageType for protobuf message awyes.ListRoutesResponse
  */
 export const ListRoutesResponse = new ListRoutesResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetRouteRequest$Type extends MessageType<GetRouteRequest> {
+    constructor() {
+        super("awyes.GetRouteRequest", [
+            { no: 1, name: "route", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "version", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GetRouteRequest>): GetRouteRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<GetRouteRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetRouteRequest): GetRouteRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* optional string route */ 1:
+                    message.route = reader.string();
+                    break;
+                case /* optional int64 version */ 2:
+                    message.version = reader.int64().toString();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetRouteRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* optional string route = 1; */
+        if (message.route !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.route);
+        /* optional int64 version = 2; */
+        if (message.version !== undefined)
+            writer.tag(2, WireType.Varint).int64(message.version);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message awyes.GetRouteRequest
+ */
+export const GetRouteRequest = new GetRouteRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetRouteResponse$Type extends MessageType<GetRouteResponse> {
+    constructor() {
+        super("awyes.GetRouteResponse", [
+            { no: 1, name: "route", kind: "message", T: () => Route }
+        ]);
+    }
+    create(value?: PartialMessage<GetRouteResponse>): GetRouteResponse {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<GetRouteResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetRouteResponse): GetRouteResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* optional awyes.Route route */ 1:
+                    message.route = Route.internalBinaryRead(reader, reader.uint32(), options, message.route);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetRouteResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* optional awyes.Route route = 1; */
+        if (message.route)
+            Route.internalBinaryWrite(message.route, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message awyes.GetRouteResponse
+ */
+export const GetRouteResponse = new GetRouteResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class StartTripRequest$Type extends MessageType<StartTripRequest> {
     constructor() {
@@ -1628,7 +1789,7 @@ export const StartTripResponse = new StartTripResponse$Type();
 class WatchTripRequest$Type extends MessageType<WatchTripRequest> {
     constructor() {
         super("awyes.WatchTripRequest", [
-            { no: 1, name: "trip_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "trip", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<WatchTripRequest>): WatchTripRequest {
@@ -1642,8 +1803,8 @@ class WatchTripRequest$Type extends MessageType<WatchTripRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional string trip_id */ 1:
-                    message.tripId = reader.string();
+                case /* optional string trip */ 1:
+                    message.trip = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1657,9 +1818,9 @@ class WatchTripRequest$Type extends MessageType<WatchTripRequest> {
         return message;
     }
     internalBinaryWrite(message: WatchTripRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional string trip_id = 1; */
-        if (message.tripId !== undefined)
-            writer.tag(1, WireType.LengthDelimited).string(message.tripId);
+        /* optional string trip = 1; */
+        if (message.trip !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.trip);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1767,7 +1928,7 @@ export const ListTripsResponse = new ListTripsResponse$Type();
 class GetTripRequest$Type extends MessageType<GetTripRequest> {
     constructor() {
         super("awyes.GetTripRequest", [
-            { no: 1, name: "trip_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "trip", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<GetTripRequest>): GetTripRequest {
@@ -1781,8 +1942,8 @@ class GetTripRequest$Type extends MessageType<GetTripRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional string trip_id */ 1:
-                    message.tripId = reader.string();
+                case /* optional string trip */ 1:
+                    message.trip = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1796,9 +1957,9 @@ class GetTripRequest$Type extends MessageType<GetTripRequest> {
         return message;
     }
     internalBinaryWrite(message: GetTripRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional string trip_id = 1; */
-        if (message.tripId !== undefined)
-            writer.tag(1, WireType.LengthDelimited).string(message.tripId);
+        /* optional string trip = 1; */
+        if (message.trip !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.trip);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1855,170 +2016,6 @@ class GetTripResponse$Type extends MessageType<GetTripResponse> {
  * @generated MessageType for protobuf message awyes.GetTripResponse
  */
 export const GetTripResponse = new GetTripResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class RegisterPositionRequest$Type extends MessageType<RegisterPositionRequest> {
-    constructor() {
-        super("awyes.RegisterPositionRequest", [
-            { no: 1, name: "position", kind: "message", T: () => Position }
-        ]);
-    }
-    create(value?: PartialMessage<RegisterPositionRequest>): RegisterPositionRequest {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        if (value !== undefined)
-            reflectionMergePartial<RegisterPositionRequest>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RegisterPositionRequest): RegisterPositionRequest {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* optional awyes.Position position */ 1:
-                    message.position = Position.internalBinaryRead(reader, reader.uint32(), options, message.position);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: RegisterPositionRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional awyes.Position position = 1; */
-        if (message.position)
-            Position.internalBinaryWrite(message.position, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message awyes.RegisterPositionRequest
- */
-export const RegisterPositionRequest = new RegisterPositionRequest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class RegisterPositionResponse$Type extends MessageType<RegisterPositionResponse> {
-    constructor() {
-        super("awyes.RegisterPositionResponse", [
-            { no: 1, name: "position", kind: "message", T: () => Position }
-        ]);
-    }
-    create(value?: PartialMessage<RegisterPositionResponse>): RegisterPositionResponse {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        if (value !== undefined)
-            reflectionMergePartial<RegisterPositionResponse>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RegisterPositionResponse): RegisterPositionResponse {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* optional awyes.Position position */ 1:
-                    message.position = Position.internalBinaryRead(reader, reader.uint32(), options, message.position);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: RegisterPositionResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional awyes.Position position = 1; */
-        if (message.position)
-            Position.internalBinaryWrite(message.position, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message awyes.RegisterPositionResponse
- */
-export const RegisterPositionResponse = new RegisterPositionResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ListPositionsRequest$Type extends MessageType<ListPositionsRequest> {
-    constructor() {
-        super("awyes.ListPositionsRequest", []);
-    }
-    create(value?: PartialMessage<ListPositionsRequest>): ListPositionsRequest {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        if (value !== undefined)
-            reflectionMergePartial<ListPositionsRequest>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListPositionsRequest): ListPositionsRequest {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message: ListPositionsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message awyes.ListPositionsRequest
- */
-export const ListPositionsRequest = new ListPositionsRequest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ListPositionsResponse$Type extends MessageType<ListPositionsResponse> {
-    constructor() {
-        super("awyes.ListPositionsResponse", [
-            { no: 1, name: "positions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Position }
-        ]);
-    }
-    create(value?: PartialMessage<ListPositionsResponse>): ListPositionsResponse {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.positions = [];
-        if (value !== undefined)
-            reflectionMergePartial<ListPositionsResponse>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListPositionsResponse): ListPositionsResponse {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* repeated awyes.Position positions */ 1:
-                    message.positions.push(Position.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: ListPositionsResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated awyes.Position positions = 1; */
-        for (let i = 0; i < message.positions.length; i++)
-            Position.internalBinaryWrite(message.positions[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message awyes.ListPositionsResponse
- */
-export const ListPositionsResponse = new ListPositionsResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class SearchRequest$Type extends MessageType<SearchRequest> {
     constructor() {
@@ -2134,14 +2131,14 @@ export const SearchResponse = new SearchResponse$Type();
 export const Awyes = new ServiceType("awyes.Awyes", [
     { name: "RegisterHandler", options: {}, I: RegisterHandlerRequest, O: RegisterHandlerResponse },
     { name: "ListHandlers", options: {}, I: ListHandlersRequest, O: ListHandlersResponse },
+    { name: "GetHandler", options: {}, I: GetHandlerRequest, O: GetHandlerResponse },
     { name: "RegisterRoute", options: {}, I: RegisterRouteRequest, O: RegisterRouteResponse },
     { name: "ListRoutes", options: {}, I: ListRoutesRequest, O: ListRoutesResponse },
+    { name: "GetRoute", options: {}, I: GetRouteRequest, O: GetRouteResponse },
     { name: "StartTrip", options: {}, I: StartTripRequest, O: StartTripResponse },
     { name: "WatchTrip", serverStreaming: true, options: {}, I: WatchTripRequest, O: Event },
     { name: "ListTrips", options: {}, I: ListTripsRequest, O: ListTripsResponse },
     { name: "GetTrip", options: {}, I: GetTripRequest, O: GetTripResponse },
-    { name: "RegisterPosition", options: {}, I: RegisterPositionRequest, O: RegisterPositionResponse },
-    { name: "ListPositions", options: {}, I: ListPositionsRequest, O: ListPositionsResponse },
     { name: "ListEvents", options: {}, I: ListEventsRequest, O: ListEventsResponse },
     { name: "Search", options: {}, I: SearchRequest, O: SearchResponse },
     { name: "RunNodeAndWait", serverStreaming: true, clientStreaming: true, options: {}, I: Event, O: Event }

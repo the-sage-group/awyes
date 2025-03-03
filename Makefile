@@ -1,6 +1,4 @@
-.PHONY: proto build run clean setup dev prod down
-
-
+.PHONY: proto build run clean setup dev prod down db-clean db-reset
 
 setup:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -34,3 +32,10 @@ up: proto
 	docker compose up --build
 down:
 	docker compose down
+
+# Database commands
+db-clean:
+	docker compose down -v postgres
+
+db-reset:
+	docker compose exec postgres psql -U awyes -d awyes -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"

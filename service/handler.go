@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/go-pg/pg/v10"
 	"github.com/the-sage-group/awyes/proto"
@@ -61,5 +62,39 @@ func (s *Service) ListHandlers(ctx context.Context, req *proto.ListHandlersReque
 
 	return &proto.ListHandlersResponse{
 		Handlers: handlers,
+	}, nil
+}
+
+// GetHandler retrieves a specific handler by its identifier
+func (s *Service) GetHandler(ctx context.Context, req *proto.GetHandlerRequest) (*proto.GetHandlerResponse, error) {
+	fmt.Printf("GetHandler: %v\n", req)
+
+	if req.GetHandler() == "" {
+		return nil, status.Error(codes.InvalidArgument, "handler identifier is required")
+	}
+
+	// Parse the handler identifier (expected format: context.name)
+	parts := strings.Split(req.GetHandler(), ".")
+	if len(parts) != 2 {
+		return nil, status.Error(codes.InvalidArgument, "handler identifier must be in format 'context.name'")
+	}
+
+	handlerContext := parts[0]
+	handlerName := parts[1]
+
+	handler := &proto.Handler{}
+	err := s.db.Model(handler).
+		Where("context = ? AND name = ?", handlerContext, handlerName).
+		Select()
+
+	if err != nil {
+		if err == pg.ErrNoRows {
+			return nil, status.Error(codes.NotFound, "handler not found")
+		}
+		return nil, fmt.Errorf("failed to query handler: %v", err)
+	}
+
+	return &proto.GetHandlerResponse{
+		Handler: handler,
 	}, nil
 }
