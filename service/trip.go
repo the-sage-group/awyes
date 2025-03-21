@@ -7,7 +7,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/the-sage-group/awyes/proto"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // ListTrips lists all trips
@@ -55,7 +54,7 @@ func (s *Service) WatchTrip(req *proto.WatchTripRequest, stream proto.Awyes_Watc
 				// Get all events for this trip newer than our last seen timestamp
 				var events []*proto.Event
 				if err := s.db.Model(&events).
-					Where("trip->>'id' = ? AND timestamp > ?", tripID, lastTimestamp).
+					Where("trip = ? AND timestamp > ?", tripID, lastTimestamp).
 					Order("timestamp ASC").
 					Select(); err != nil {
 					errChan <- fmt.Errorf("failed to get events: %v", err)
@@ -106,7 +105,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 		Id:           &tripID,
 		Route:        &routeName,
 		RouteVersion: &routeVersion,
-		State:        make(map[string]*structpb.Value),
+		State:        req.GetState(),
 		Entity:       req.GetEntity(),
 		StartedAt:    &startedAt,
 	}
@@ -217,6 +216,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 				Position:  position,
 				Trip:      &tripID,
 				Timestamp: &ts,
+				State:     trip.GetState(),
 			}
 
 			// Wait for the trip channel to be populated by the executing node
@@ -251,6 +251,13 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 					}
 					queue = append(queue, nextPosition)
 				}
+			}
+
+			// Update the trip with the current state
+			fmt.Printf("updating trip with state: %v\n", trip.GetState())
+			if _, err := s.db.Model(trip).Set("state = ?", trip.GetState()).Where("id = ?", tripID).Update(); err != nil {
+				fmt.Printf("failed to update trip with state: %v\n", err)
+				return
 			}
 		}
 

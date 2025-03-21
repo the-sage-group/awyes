@@ -11,7 +11,6 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Value } from "./google/protobuf/struct";
 import { FieldDescriptorProto } from "./google/protobuf/descriptor";
 /**
  * Handler definition
@@ -144,10 +143,10 @@ export interface Trip {
      */
     completedAt?: string;
     /**
-     * @generated from protobuf field: map<string, google.protobuf.Value> state = 7;
+     * @generated from protobuf field: map<string, bytes> state = 7;
      */
     state: {
-        [key: string]: Value;
+        [key: string]: Uint8Array;
     };
 }
 /**
@@ -204,10 +203,10 @@ export interface Event {
      */
     exitMessage?: string;
     /**
-     * @generated from protobuf field: map<string, google.protobuf.Value> state = 9;
+     * @generated from protobuf field: map<string, bytes> state = 9;
      */
     state: {
-        [key: string]: Value;
+        [key: string]: Uint8Array;
     };
 }
 /**
@@ -353,10 +352,10 @@ export interface StartTripRequest {
      */
     start?: Position;
     /**
-     * @generated from protobuf field: map<string, google.protobuf.Value> state = 4;
+     * @generated from protobuf field: map<string, bytes> state = 4;
      */
     state: {
-        [key: string]: Value;
+        [key: string]: Uint8Array;
     };
 }
 /**
@@ -785,7 +784,7 @@ class Trip$Type extends MessageType<Trip> {
             { no: 4, name: "route_version", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
             { no: 5, name: "started_at", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
             { no: 6, name: "completed_at", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 7, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
+            { no: 7, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } }
         ]);
     }
     create(value?: PartialMessage<Trip>): Trip {
@@ -818,7 +817,7 @@ class Trip$Type extends MessageType<Trip> {
                 case /* optional int64 completed_at */ 6:
                     message.completedAt = reader.int64().toString();
                     break;
-                case /* map<string, google.protobuf.Value> state */ 7:
+                case /* map<string, bytes> state */ 7:
                     this.binaryReadMap7(message.state, reader, options);
                     break;
                 default:
@@ -841,12 +840,12 @@ class Trip$Type extends MessageType<Trip> {
                     key = reader.string();
                     break;
                 case 2:
-                    val = Value.internalBinaryRead(reader, reader.uint32(), options);
+                    val = reader.bytes();
                     break;
                 default: throw new globalThis.Error("unknown map entry field for field awyes.Trip.state");
             }
         }
-        map[key ?? ""] = val ?? Value.create();
+        map[key ?? ""] = val ?? new Uint8Array(0);
     }
     internalBinaryWrite(message: Trip, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* optional string id = 1; */
@@ -867,13 +866,9 @@ class Trip$Type extends MessageType<Trip> {
         /* optional int64 completed_at = 6; */
         if (message.completedAt !== undefined)
             writer.tag(6, WireType.Varint).int64(message.completedAt);
-        /* map<string, google.protobuf.Value> state = 7; */
-        for (let k of globalThis.Object.keys(message.state)) {
-            writer.tag(7, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
-            writer.tag(2, WireType.LengthDelimited).fork();
-            Value.internalBinaryWrite(message.state[k], writer, options);
-            writer.join().join();
-        }
+        /* map<string, bytes> state = 7; */
+        for (let k of globalThis.Object.keys(message.state))
+            writer.tag(7, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).bytes(message.state[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -949,7 +944,7 @@ class Event$Type extends MessageType<Event> {
             { no: 6, name: "position", kind: "message", T: () => Position },
             { no: 7, name: "exit_label", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 8, name: "exit_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 9, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
+            { no: 9, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } }
         ]);
     }
     create(value?: PartialMessage<Event>): Event {
@@ -988,7 +983,7 @@ class Event$Type extends MessageType<Event> {
                 case /* optional string exit_message */ 8:
                     message.exitMessage = reader.string();
                     break;
-                case /* map<string, google.protobuf.Value> state */ 9:
+                case /* map<string, bytes> state */ 9:
                     this.binaryReadMap9(message.state, reader, options);
                     break;
                 default:
@@ -1011,12 +1006,12 @@ class Event$Type extends MessageType<Event> {
                     key = reader.string();
                     break;
                 case 2:
-                    val = Value.internalBinaryRead(reader, reader.uint32(), options);
+                    val = reader.bytes();
                     break;
                 default: throw new globalThis.Error("unknown map entry field for field awyes.Event.state");
             }
         }
-        map[key ?? ""] = val ?? Value.create();
+        map[key ?? ""] = val ?? new Uint8Array(0);
     }
     internalBinaryWrite(message: Event, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* optional string id = 1; */
@@ -1043,13 +1038,9 @@ class Event$Type extends MessageType<Event> {
         /* optional string exit_message = 8; */
         if (message.exitMessage !== undefined)
             writer.tag(8, WireType.LengthDelimited).string(message.exitMessage);
-        /* map<string, google.protobuf.Value> state = 9; */
-        for (let k of globalThis.Object.keys(message.state)) {
-            writer.tag(9, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
-            writer.tag(2, WireType.LengthDelimited).fork();
-            Value.internalBinaryWrite(message.state[k], writer, options);
-            writer.join().join();
-        }
+        /* map<string, bytes> state = 9; */
+        for (let k of globalThis.Object.keys(message.state))
+            writer.tag(9, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).bytes(message.state[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1658,7 +1649,7 @@ class StartTripRequest$Type extends MessageType<StartTripRequest> {
             { no: 1, name: "route", kind: "message", T: () => Route },
             { no: 2, name: "entity", kind: "message", T: () => Entity },
             { no: 3, name: "start", kind: "message", T: () => Position },
-            { no: 4, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Value } }
+            { no: 4, name: "state", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } }
         ]);
     }
     create(value?: PartialMessage<StartTripRequest>): StartTripRequest {
@@ -1682,7 +1673,7 @@ class StartTripRequest$Type extends MessageType<StartTripRequest> {
                 case /* optional awyes.Position start */ 3:
                     message.start = Position.internalBinaryRead(reader, reader.uint32(), options, message.start);
                     break;
-                case /* map<string, google.protobuf.Value> state */ 4:
+                case /* map<string, bytes> state */ 4:
                     this.binaryReadMap4(message.state, reader, options);
                     break;
                 default:
@@ -1705,12 +1696,12 @@ class StartTripRequest$Type extends MessageType<StartTripRequest> {
                     key = reader.string();
                     break;
                 case 2:
-                    val = Value.internalBinaryRead(reader, reader.uint32(), options);
+                    val = reader.bytes();
                     break;
                 default: throw new globalThis.Error("unknown map entry field for field awyes.StartTripRequest.state");
             }
         }
-        map[key ?? ""] = val ?? Value.create();
+        map[key ?? ""] = val ?? new Uint8Array(0);
     }
     internalBinaryWrite(message: StartTripRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* optional awyes.Route route = 1; */
@@ -1722,13 +1713,9 @@ class StartTripRequest$Type extends MessageType<StartTripRequest> {
         /* optional awyes.Position start = 3; */
         if (message.start)
             Position.internalBinaryWrite(message.start, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* map<string, google.protobuf.Value> state = 4; */
-        for (let k of globalThis.Object.keys(message.state)) {
-            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
-            writer.tag(2, WireType.LengthDelimited).fork();
-            Value.internalBinaryWrite(message.state[k], writer, options);
-            writer.join().join();
-        }
+        /* map<string, bytes> state = 4; */
+        for (let k of globalThis.Object.keys(message.state))
+            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).bytes(message.state[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

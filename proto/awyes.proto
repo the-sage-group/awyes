@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/struct.proto";
 import "google/protobuf/descriptor.proto";
 
 package awyes;
@@ -49,7 +48,7 @@ message Trip {
   optional int64 route_version = 4;
   optional int64 started_at = 5;
   optional int64 completed_at = 6;
-  map<string, google.protobuf.Value> state = 7;
+  map<string, bytes> state = 7;
 }
 
 // Entity definition
@@ -73,7 +72,7 @@ message Event {
   optional Position position = 6;
   optional string exit_label = 7;
   optional string exit_message = 8;
-  map<string, google.protobuf.Value> state = 9;
+  map<string, bytes> state = 9;
 }
 
 // Status for events and trips
@@ -117,7 +116,7 @@ message StartTripRequest {
   optional Route route = 1;
   optional Entity entity = 2;
   optional Position start = 3;
-  map<string, google.protobuf.Value> state = 4;
+  map<string, bytes> state = 4;
 }
 message StartTripResponse { optional Trip trip = 1; }
 message WatchTripRequest { optional string trip = 1; }
