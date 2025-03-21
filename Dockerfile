@@ -1,7 +1,8 @@
-FROM golang:1.21-alpine
+FROM golang:1.24-alpine
 
-# Install build dependencies
-RUN apk add --no-cache protoc protobuf-dev
+# Install build dependencies and air for hot reloading
+RUN apk add --no-cache protoc protobuf-dev && \
+    go install github.com/air-verse/air@latest
 
 # Install protoc plugins
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
@@ -21,5 +22,5 @@ COPY . .
 # Expose gRPC port
 EXPOSE 50051
 
-# Run the server
-CMD ["go", "run", "main.go"] 
+# Run with air in development mode
+CMD ["air", "-c", ".air.toml"] 

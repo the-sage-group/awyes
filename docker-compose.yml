@@ -6,6 +6,8 @@ services:
     ports:
       - "50051:50051"
     restart: unless-stopped
+    volumes:
+      - .:/app
     networks:
       - awyes-net
     depends_on:

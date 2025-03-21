@@ -22,7 +22,7 @@ message Position {
   optional string name = 1;
   optional string description = 2;
   optional string handler = 3;
-  repeated Transition transitions = 4;
+  repeated Transition transition = 4;
 }
 
 // Transition definition
@@ -37,8 +37,8 @@ message Route {
   optional string name = 2;
   optional int64 version = 3;
   optional string description = 4;
-  repeated Position positions = 5;
-  repeated google.protobuf.FieldDescriptorProto parameters = 7;
+  repeated Position position = 5;
+  repeated google.protobuf.FieldDescriptorProto parameter = 6;
 }
 
 // Trip definition

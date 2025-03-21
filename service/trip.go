@@ -123,7 +123,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 
 	// Create a map of positions by name
 	positions := make(map[string]*proto.Position)
-	for _, position := range req.Route.GetPositions() {
+	for _, position := range req.Route.GetPosition() {
 		positions[position.GetName()] = position
 	}
 
@@ -242,7 +242,7 @@ func (s *Service) StartTrip(ctx context.Context, req *proto.StartTripRequest) (*
 			}
 
 			// Find the next position to execute
-			for _, transition := range position.GetTransitions() {
+			for _, transition := range position.GetTransition() {
 				if transition.GetLabel() == event.GetExitLabel() {
 					nextPosition, ok := positions[transition.GetPosition()]
 					if !ok {

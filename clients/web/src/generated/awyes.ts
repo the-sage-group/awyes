@@ -63,9 +63,9 @@ export interface Position {
      */
     handler?: string;
     /**
-     * @generated from protobuf field: repeated awyes.Transition transitions = 4;
+     * @generated from protobuf field: repeated awyes.Transition transition = 4;
      */
-    transitions: Transition[];
+    transition: Transition[];
 }
 /**
  * Transition definition
@@ -105,13 +105,13 @@ export interface Route {
      */
     description?: string;
     /**
-     * @generated from protobuf field: repeated awyes.Position positions = 5;
+     * @generated from protobuf field: repeated awyes.Position position = 5;
      */
-    positions: Position[];
+    position: Position[];
     /**
-     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameters = 7;
+     * @generated from protobuf field: repeated google.protobuf.FieldDescriptorProto parameter = 6;
      */
-    parameters: FieldDescriptorProto[];
+    parameter: FieldDescriptorProto[];
 }
 /**
  * Trip definition
@@ -578,12 +578,12 @@ class Position$Type extends MessageType<Position> {
             { no: 1, name: "name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "handler", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "transitions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Transition }
+            { no: 4, name: "transition", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Transition }
         ]);
     }
     create(value?: PartialMessage<Position>): Position {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.transitions = [];
+        message.transition = [];
         if (value !== undefined)
             reflectionMergePartial<Position>(this, message, value);
         return message;
@@ -602,8 +602,8 @@ class Position$Type extends MessageType<Position> {
                 case /* optional string handler */ 3:
                     message.handler = reader.string();
                     break;
-                case /* repeated awyes.Transition transitions */ 4:
-                    message.transitions.push(Transition.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated awyes.Transition transition */ 4:
+                    message.transition.push(Transition.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -626,9 +626,9 @@ class Position$Type extends MessageType<Position> {
         /* optional string handler = 3; */
         if (message.handler !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.handler);
-        /* repeated awyes.Transition transitions = 4; */
-        for (let i = 0; i < message.transitions.length; i++)
-            Transition.internalBinaryWrite(message.transitions[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* repeated awyes.Transition transition = 4; */
+        for (let i = 0; i < message.transition.length; i++)
+            Transition.internalBinaryWrite(message.transition[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -700,14 +700,14 @@ class Route$Type extends MessageType<Route> {
             { no: 2, name: "name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "version", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
             { no: 4, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "positions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Position },
-            { no: 7, name: "parameters", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
+            { no: 5, name: "position", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Position },
+            { no: 6, name: "parameter", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => FieldDescriptorProto }
         ]);
     }
     create(value?: PartialMessage<Route>): Route {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.positions = [];
-        message.parameters = [];
+        message.position = [];
+        message.parameter = [];
         if (value !== undefined)
             reflectionMergePartial<Route>(this, message, value);
         return message;
@@ -729,11 +729,11 @@ class Route$Type extends MessageType<Route> {
                 case /* optional string description */ 4:
                     message.description = reader.string();
                     break;
-                case /* repeated awyes.Position positions */ 5:
-                    message.positions.push(Position.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated awyes.Position position */ 5:
+                    message.position.push(Position.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated google.protobuf.FieldDescriptorProto parameters */ 7:
-                    message.parameters.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated google.protobuf.FieldDescriptorProto parameter */ 6:
+                    message.parameter.push(FieldDescriptorProto.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -759,12 +759,12 @@ class Route$Type extends MessageType<Route> {
         /* optional string description = 4; */
         if (message.description !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.description);
-        /* repeated awyes.Position positions = 5; */
-        for (let i = 0; i < message.positions.length; i++)
-            Position.internalBinaryWrite(message.positions[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* repeated google.protobuf.FieldDescriptorProto parameters = 7; */
-        for (let i = 0; i < message.parameters.length; i++)
-            FieldDescriptorProto.internalBinaryWrite(message.parameters[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* repeated awyes.Position position = 5; */
+        for (let i = 0; i < message.position.length; i++)
+            Position.internalBinaryWrite(message.position[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* repeated google.protobuf.FieldDescriptorProto parameter = 6; */
+        for (let i = 0; i < message.parameter.length; i++)
+            FieldDescriptorProto.internalBinaryWrite(message.parameter[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

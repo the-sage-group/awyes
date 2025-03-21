@@ -82,6 +82,7 @@ func (s *Service) GetHandler(ctx context.Context, req *proto.GetHandlerRequest) 
 	handlerContext := parts[0]
 	handlerName := parts[1]
 
+	fmt.Printf("handlerContext: %s, handlerName: %s\n", handlerContext, handlerName)
 	handler := &proto.Handler{}
 	err := s.db.Model(handler).
 		Where("context = ? AND name = ?", handlerContext, handlerName).
